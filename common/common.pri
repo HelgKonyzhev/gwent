@@ -15,7 +15,6 @@ SOURCES += \
     $$PWD/player_data.cpp \
     $$PWD/socket.cpp \
     $$PWD/state.cpp \
-    $$PWD/state_machine.cpp \
     $$PWD/threshold_state.cpp
 
 HEADERS += \
@@ -34,7 +33,6 @@ HEADERS += \
     $$PWD/socket.h \
     $$PWD/state.h \
     $$PWD/result.h \
-    $$PWD/state_machine.h \
     $$PWD/threshold_state.h
 
 INCLUDEPATH += $$PWD
