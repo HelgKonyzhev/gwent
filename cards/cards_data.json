@@ -1,0 +1,380 @@
+{
+    "cards":
+    {
+        "special":
+        [
+            {
+                "name": "clear_sky",
+                "image": "cards_images/special/clear_sky.png",
+                "fraction": "special",
+                "tags": ["special", "weather"]
+            },
+            {
+                "name": "execution",
+                "image": "cards_images/special/execution.png",
+                "fraction": "special",
+                "tags": ["special"]
+            },
+            {
+                "name": "frost",
+                "image": "cards_images/special/frost.png",
+                "fraction": "special",
+                "tags": ["special", "weather"]
+            },
+            {
+                "name": "horn",
+                "image": "cards_images/special/horn.png",
+                "fraction": "special",
+                "tags": ["special"]
+            },
+            {
+                "name": "mist",
+                "image": "cards_images/special/mist.png",
+                "fraction": "special",
+                "tags": ["special", "weather"]
+            },
+            {
+                "name": "rain",
+                "image": "cards_images/special/rain.png",
+                "fraction": "special",
+                "tags": ["special", "weather"]
+            },
+            {
+                "name": "scarerow",
+                "image": "cards_images/special/scarerow.png",
+                "fraction": "special",
+                "tags": ["special"]
+            }
+        ],
+        "neutrals":
+        [
+            {
+                "name": "avalakh",
+                "image": "cards_images/neutrals/avalakh.png",
+                "fraction": "neutrals",
+                "tags": ["squad", "spy"]
+            },
+            {
+                "name": "borh",
+                "image": "cards_images/neutrals/borh.png",
+                "fraction": "neutrals",
+                "tags": ["squad"]
+            },
+            {
+                "name": "ciri",
+                "image": "cards_images/neutrals/ciri.png",
+                "fraction": "neutrals",
+                "tags": ["squad"]
+            },
+            {
+                "name": "dundelion",
+                "image": "cards_images/neutrals/dundelion.png",
+                "fraction": "neutrals",
+                "tags": ["squad"]
+            },
+            {
+                "name": "geralt",
+                "image": "cards_images/neutrals/geralt.png",
+                "fraction": "neutrals",
+                "tags": ["squad"]
+            },
+            {
+                "name": "jennifer",
+                "image": "cards_images/neutrals/jennifer.png",
+                "fraction": "neutrals",
+                "tags": ["squad"]
+            },
+            {
+                "name": "regis",
+                "image": "cards_images/neutrals/regis.png",
+                "fraction": "neutrals",
+                "tags": ["squad"]
+            },
+            {
+                "name": "triss",
+                "image": "cards_images/neutrals/triss.png",
+                "fraction": "neutrals",
+                "tags": ["squad"]
+            },
+            {
+                "name": "vesemir",
+                "image": "cards_images/neutrals/vesemir.png",
+                "fraction": "neutrals",
+                "tags": ["squad"]
+            },
+            {
+                "name": "zoltan",
+                "image": "cards_images/neutrals/zoltan.png",
+                "fraction": "neutrals",
+                "tags": ["squad"]
+            }
+        ],
+        "monsters":
+        [
+            {
+                "name": "basilisk",
+                "image": "cards_images/monsters/basilisk.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "demon",
+                "image": "cards_images/monsters/demon.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "earth_elemental",
+                "image": "cards_images/monsters/earth_elemental.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "endriaga",
+                "image": "cards_images/monsters/endriaga.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "fire_elemental",
+                "image": "cards_images/monsters/fire_elemental.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "fogger",
+                "image": "cards_images/monsters/fogger.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "frost_giant",
+                "image": "cards_images/monsters/frost_giant.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "gargoyle",
+                "image": "cards_images/monsters/gargoyle.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "ghoul_1",
+                "image": "cards_images/monsters/ghoul_1.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "ghoul_2",
+                "image": "cards_images/monsters/ghoul_2.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "ghoul_3",
+                "image": "cards_images/monsters/ghoul_3.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "gravebaba",
+                "image": "cards_images/monsters/gravebaba.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "great_headeye",
+                "image": "cards_images/monsters/great_headeye.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "grifon",
+                "image": "cards_images/monsters/grifon.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "harpy",
+                "image": "cards_images/monsters/harpy.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "harpy_celeno",
+                "image": "cards_images/monsters/harpy_celeno.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "headeye_1",
+                "image": "cards_images/monsters/headeye_1.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "headeye_2",
+                "image": "cards_images/monsters/headeye_2.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "headeye_3",
+                "image": "cards_images/monsters/headeye_3.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "igosha",
+                "image": "cards_images/monsters/igosha.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "naker_1",
+                "image": "cards_images/monsters/naker_1.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "naker_2",
+                "image": "cards_images/monsters/naker_2.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "naker_3",
+                "image": "cards_images/monsters/naker_3.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "plague_maiden",
+                "image": "cards_images/monsters/plague_maiden.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "scarer",
+                "image": "cards_images/monsters/scarer.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "vampyre_bruksa",
+                "image": "cards_images/monsters/vampyre_bruksa.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "vampyre_ekimma",
+                "image": "cards_images/monsters/vampyre_ekimma.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "vampyre_fleder",
+                "image": "cards_images/monsters/vampyre_fleder.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "vampyre_garkain",
+                "image": "cards_images/monsters/vampyre_garkain.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "vampyre_katakan",
+                "image": "cards_images/monsters/vampyre_katakan.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "werewolf",
+                "image": "cards_images/monsters/werewolf.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "witch_cook",
+                "image": "cards_images/monsters/witch_cook.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "witch_tailor",
+                "image": "cards_images/monsters/witch_tailor.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "witch_whisper",
+                "image": "cards_images/monsters/witch_whisper.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "wyrm",
+                "image": "cards_images/monsters/wyrm.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "wyvern",
+                "image": "cards_images/monsters/wyvern.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "eredin_1",
+                "image": "cards_images/monsters/leaders/eredin_1.png",
+                "fraction": "monsters",
+                "tags": ["leader"]
+            },
+            {
+                "name": "eredin_2",
+                "image": "cards_images/monsters/leaders/eredin_2.png",
+                "fraction": "monsters",
+                "tags": ["leader"]
+            },
+            {
+                "name": "eredin_3",
+                "image": "cards_images/monsters/leaders/eredin_3.png",
+                "fraction": "monsters",
+                "tags": ["leader"]
+            },
+            {
+                "name": "eredin_4",
+                "image": "cards_images/monsters/leaders/eredin_4.png",
+                "fraction": "monsters",
+                "tags": ["leader"]
+            },
+            {
+                "name": "draug",
+                "image": "cards_images/monsters/gold/draug.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "imlerich",
+                "image": "cards_images/monsters/gold/imlerich.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "keiran",
+                "image": "cards_images/monsters/gold/keiran.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            },
+            {
+                "name": "leshiy",
+                "image": "cards_images/monsters/gold/leshiy.png",
+                "fraction": "monsters",
+                "tags": ["squad"]
+            }
+        ]
+    }
+}

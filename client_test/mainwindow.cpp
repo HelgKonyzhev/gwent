@@ -15,8 +15,14 @@
 #include <common/events/start_game_event.h>
 #include <QMessageBox>
 #include <common/events/request_game_event.h>
-#include <common/threshold_state.h>
+#include <common/doorstep_state.h>
 #include <common/lobby_state.h>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <common/cards_data/cards_data.h>
+#include <common/cards_data/card_data.h>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -96,12 +102,55 @@ MainWindow::MainWindow(QWidget* parent)
     connect(startGameButton, &QPushButton::clicked, this, &MainWindow::onStartGameClicked);
     m_layout->addWidget(startGameButton, 1, 6);
 
+    {
+        QHBoxLayout* cardsLayout = new QHBoxLayout;
+        auto cardsData = CardsData::instance();
+
+        QHash<QString, QVariantList> filters;
+        filters["tags"] = {"leader"};
+        const auto filtered = cardsData->cards().get(filters);
+
+        for (const auto card : filtered)
+        {
+            auto imgPath = QString(":/%1").arg(card->image());
+            QPixmap pic;
+            auto res = pic.load(imgPath);
+            if (!res)
+            {
+                qDebug() << "failed" << imgPath;
+                continue;
+            }
+
+            auto l = new QLabel{this};
+            l->setPixmap(pic);
+            cardsLayout->addWidget(l);
+        }
+
+        //        for (const auto cardData : cardsData->cards().getAll())
+        //        {
+        //            auto imgPath = QString(":/%1").arg(cardData->image());
+        //            QPixmap pic;
+        //            auto res = pic.load(imgPath);
+        //            if (!res)
+        //            {
+        //                qDebug() << "failed" << imgPath;
+        //                continue;
+        //            }
+
+        //            auto l = new QLabel{this};
+        //            l->setPixmap(pic);
+        //            cardsLayout->addWidget(l);
+        //        }
+
+        m_layout->addItem(cardsLayout, 0, 7);
+    }
+
     connect(m_socket, &Socket::eventRecieved, this, &MainWindow::onEventRecieved);
 
-    connect(m_player->thresholdState(), &ThresholdState::registered, this, &MainWindow::onRegistered);
-    connect(m_player->thresholdState(), &ThresholdState::registrationFailed, this,
+    connect(m_player->thresholdState(), &DoorstepState::registered, this, &MainWindow::onRegistered);
+    connect(m_player->thresholdState(), &DoorstepState::registrationFailed, this,
             &MainWindow::onRegistrationFailed);
-    connect(m_player->thresholdState(), &ThresholdState::loginFailed, this, &MainWindow::onLogInFailed);
+    connect(m_player->thresholdState(), &DoorstepState::loginFailed, this, &MainWindow::onLogInFailed);
 
     connect(m_player->lobbyState(), &LobbyState::loggedIn, this, &MainWindow::onLoggedIn);
     connect(m_player->lobbyState(), &LobbyState::lobbyUpdated, this, &MainWindow::onLobbyUpdated);

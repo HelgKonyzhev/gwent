@@ -1,11 +1,11 @@
-#include "threshold_state.h"
+#include "doorstep_state.h"
 #include <common/events/login_event.h>
 #include <common/events/register_event.h>
 #include <common/state.h>
 #include <common/event_transition.h>
 #include <common/final_state.h>
 
-ThresholdState::ThresholdState(Socket *socket, QState *parent)
+DoorstepState::DoorstepState(Socket *socket, QState *parent)
     : State{parent}
     , m_socket{socket}
 {

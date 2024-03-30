@@ -25,3 +25,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 include(../common/common.pri)
 
 INCLUDEPATH += ../
+
+RESOURCES += \
+    ../cards/cards_images.qrc \
+    ../cards/cards_data.qrc

@@ -9,7 +9,7 @@
 #include <common/events/lobby_updated_event.h>
 #include <common/events/start_game_event.h>
 #include <common/events/request_game_event.h>
-#include <common/threshold_state.h>
+#include <common/doorstep_state.h>
 #include <common/lobby_state.h>
 
 Server::Server(QObject* parent)
@@ -36,9 +36,9 @@ void Server::onNewConnection()
 
     connect(player->socket(), &Socket::disconnected, player, [player, this]() { onDisconnected(player); });
 
-    connect(player->thresholdState(), &ThresholdState::logging, this,
+    connect(player->thresholdState(), &DoorstepState::logging, this,
             [this, player](LogInEvent* event) { onLoggingIn(player, event); });
-    connect(player->thresholdState(), &ThresholdState::registration, this,
+    connect(player->thresholdState(), &DoorstepState::registration, this,
             [this, player](RegisterEvent* event) { onRegistration(player, event); });
     connect(player->lobbyState(), &LobbyState::loggedIn, this,
             [this, player](LoggedInEvent* event) { onLoggedIn(player, event); });

@@ -9,12 +9,12 @@ class LogInEvent;
 // class LoggedInEvent;
 class LogInFailedEvent;
 
-class ThresholdState : public State
+class DoorstepState : public State
 {
     Q_OBJECT
 
 public:
-    ThresholdState(Socket* socket, QState* parent);
+    DoorstepState(Socket* socket, QState* parent);
 
 signals:
     void registration(RegisterEvent* event);

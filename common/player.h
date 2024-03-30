@@ -20,7 +20,7 @@ class GameStartedEvent;
 class RequestGameEvent;
 class GameAcceptedEvent;
 class GameDeclinedEvent;
-class ThresholdState;
+class DoorstepState;
 class LobbyState;
 
 class Player : public QObject
@@ -37,7 +37,7 @@ public:
     const std::optional<PlayerData>& data() const { return m_data; }
     const std::optional<QStringList>& playersInLobby() const { return m_playersInLobby; }
 
-    const ThresholdState* thresholdState() const { return m_thresholdState; }
+    const DoorstepState* thresholdState() const { return m_thresholdState; }
     const LobbyState* lobbyState() const { return m_lobbyState; }
 
 signals:
@@ -61,6 +61,6 @@ private:
     bool m_inLobby = false;
     std::optional<PlayerData> m_data;
     std::optional<QStringList> m_playersInLobby;
-    ThresholdState* m_thresholdState;
+    DoorstepState* m_thresholdState;
     LobbyState* m_lobbyState;
 };

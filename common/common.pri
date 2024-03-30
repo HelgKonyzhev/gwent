@@ -1,6 +1,11 @@
 QT += core websockets statemachine
 
 SOURCES += \
+    $$PWD/cards_data/card_data.cpp \
+    $$PWD/cards_data/cards_data.cpp \
+    $$PWD/cards_data/cards_set.cpp \
+    $$PWD/deck.cpp \
+    $$PWD/doorstep_state.cpp \
     $$PWD/event_transition.cpp \
     $$PWD/events/event.cpp \
     $$PWD/events/lobby_updated_event.cpp \
@@ -14,10 +19,14 @@ SOURCES += \
     $$PWD/player.cpp \
     $$PWD/player_data.cpp \
     $$PWD/socket.cpp \
-    $$PWD/state.cpp \
-    $$PWD/threshold_state.cpp
+    $$PWD/state.cpp
 
 HEADERS += \
+    $$PWD/cards_data/card_data.h \
+    $$PWD/cards_data/cards_data.h \
+    $$PWD/cards_data/cards_set.h \
+    $$PWD/deck.h \
+    $$PWD/doorstep_state.h \
     $$PWD/event_transition.h \
     $$PWD/events/event.h \
     $$PWD/events/lobby_updated_event.h \
@@ -32,7 +41,6 @@ HEADERS += \
     $$PWD/player_data.h \
     $$PWD/socket.h \
     $$PWD/state.h \
-    $$PWD/result.h \
-    $$PWD/threshold_state.h
+    $$PWD/result.h
 
 INCLUDEPATH += $$PWD

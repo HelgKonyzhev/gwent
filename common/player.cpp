@@ -11,7 +11,7 @@
 #include <common/events/lobby_updated_event.h>
 #include <common/events/start_game_event.h>
 #include <common/events/request_game_event.h>
-#include <common/threshold_state.h>
+#include <common/doorstep_state.h>
 #include <common/lobby_state.h>
 #include <QSignalTransition>
 
@@ -19,7 +19,7 @@ Player::Player(Socket *socket, QObject *parent)
     : QObject{parent}
     , m_fsm{new QStateMachine{this}}
     , m_socket{socket}
-    , m_thresholdState{new ThresholdState{m_socket, m_fsm}}
+    , m_thresholdState{new DoorstepState{m_socket, m_fsm}}
     , m_lobbyState{new LobbyState{m_socket, m_fsm}}
 {
 
