@@ -67,7 +67,7 @@ void Server::onLoggingIn(Player* player, LogInEvent* event)
     if (!playerData)
         player->postEvent(new LogInFailedEvent{event->username(), playerData.error()});
     else
-        player->postEvent(new LoggedInEvent{playerData.value()});
+        player->postEvent(new LoggedInEvent{playerData.value<QSharedPointer<PlayerData>>()});
 }
 
 void Server::onRegistration(Player* player, RegisterEvent* event)

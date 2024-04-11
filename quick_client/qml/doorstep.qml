@@ -2,7 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import common.events
 
-Item {
+Item
+{
     Column
     {
         anchors.centerIn: parent

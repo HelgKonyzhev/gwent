@@ -16,7 +16,7 @@ public:
 
     bool load();
     Result add(const QString& playerName, const QString& password);
-    ResultValue<QSharedPointer<PlayerData>> get(const QString& username, const QString& password);
+    ResultValue get(const QString& username, const QString& password);
 
 private:
     Result save();

@@ -44,7 +44,7 @@ void Socket::onTextMessageRecieved(const QString& message)
         return;
     }
 
-    qDebug() << "eventRecieved" << event.value()->type();
+    qDebug() << "eventRecieved" << event.value<Event*>()->type();
 
-    emit eventRecieved(event.value());
+    emit eventRecieved(event.value<Event*>());
 }

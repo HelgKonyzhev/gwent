@@ -55,8 +55,8 @@ public:
     Q_ENUM(Type)
 
     static Event* make(Type t);
-    static ResultValue<Event*> fromJson(const QJsonObject& eventJs);
-    static ResultValue<Event*> fromRawJson(const QByteArray& rawJson);
+    static ResultValue fromJson(const QJsonObject& eventJs);
+    static ResultValue fromRawJson(const QByteArray& rawJson);
 
     template <typename T>
     static void registerEvent()

@@ -50,7 +50,7 @@ Result PlayerStore::add(const QString& playerName, const QString& password)
     std::unique_lock lck{m_mtx};
 
     if (m_players.contains(playerName))
-        return ResultError{"\'", playerName, "\'", " aleady registered"};
+        return ResultError{QString{"\'%1\' already registered"}.arg(playerName)};
 
     auto playerData = QSharedPointer<PlayerData>{new PlayerData(playerName, password)};
     m_players.insert(playerName, playerData);
@@ -58,13 +58,13 @@ Result PlayerStore::add(const QString& playerName, const QString& password)
     return save();
 }
 
-ResultValue<QSharedPointer<PlayerData> > PlayerStore::get(const QString& username, const QString& password)
+ResultValue PlayerStore::get(const QString& username, const QString& password)
 {
     std::shared_lock lck{m_mtx};
 
     auto it = m_players.find(username);
     if (it == m_players.end())
-        return ResultError{"\'", username, "\'", " doesn't exist"};
+        return ResultError{QString{"\'%1\' doesn't exist"}.arg(username)};
 
     if (it.value()->password() != password)
         return ResultError{QString{"wrong password"}};

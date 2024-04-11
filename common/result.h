@@ -1,76 +1,48 @@
 #pragma once
-#include <optional>
-#include <sstream>
-#include <variant>
 #include <QString>
-#include <QTextStream>
+#include <QVariant>
 
 class ResultError
 {
 public:
+    ResultError() = default;
     ResultError(const ResultError&) = default;
     ResultError(ResultError&&) = default;
     ResultError& operator=(const ResultError&) = default;
     ResultError& operator=(ResultError&&) = default;
 
-    template <typename Arg0, typename... Args,
-             std::enable_if_t<!std::is_same_v<std::remove_reference_t<Arg0>, ResultError>, bool> = true>
-    explicit ResultError(Arg0&& arg0, Args&&... args)
-        : m_error{}
-    {
-        QTextStream ss{&m_error};
-        ss << arg0;
-        ((ss << args), ...);
-    }
+    ResultError(const QString& error);
 
     const QString& get() const { return m_error; }
+    void set(const QString& error) { m_error = error; }
 
 private:
     QString m_error;
 };
 
-class DerefError : public std::logic_error
-{
-public:
-    DerefError(const QString& error)
-        : logic_error{error.toStdString()}
-    {
-    }
-};
+Q_DECLARE_METATYPE(ResultError);
 
-template <typename ValueT>
 class ResultValue
 {
-    static_assert(!std::is_same_v<ValueT, ResultError>, "Result value can't be Error");
-
-    using ValueOrError = std::variant<ValueT, ResultError>;
-
-    enum Index
-    {
-        ValueIdx,
-        ErrorIdx
-    };
+    Q_PROPERTY(bool valid READ isValid CONSTANT)
+    Q_PROPERTY(QString error READ error CONSTANT)
+    Q_PROPERTY(QVariant value READ value CONSTANT)
 
 public:
-    using Value = ValueT;
+    ResultValue(const QVariant& value);
+    ResultValue(QVariant&& value);
+    ResultValue(const ResultError& error);
+    ResultValue(ResultError&& error);
 
-    ResultValue(const ValueT& value)
-        : m_valueOrError{value}
+    template <typename T>
+    ResultValue(const T& value)
+        : m_valueOrError{QVariant::fromValue(value)}
     {
     }
 
-    ResultValue(ValueT&& value)
-        : m_valueOrError{std::move(value)}
-    {
-    }
-
-    ResultValue(const ResultError& error)
-        : m_valueOrError{error}
-    {
-    }
-
-    ResultValue(ResultError&& error)
-        : m_valueOrError{std::move(error)}
+    template <typename T>
+    ResultValue(T&& value)
+        : m_valueOrError{QVariant::fromValue(std::move(value))}
     {
     }
 
@@ -79,89 +51,45 @@ public:
     ResultValue(const ResultValue&) = default;
     ResultValue& operator=(const ResultValue&) = default;
 
-    template <typename OtherValue,
-              typename std::enable_if_t<std::is_integral_v<OtherValue> || std::is_enum_v<OtherValue> ||
-                                            std::is_floating_point_v<OtherValue>,
-                                        bool> = true>
-    ResultValue<OtherValue> convertTo() const
-    {
-        if (m_valueOrError.index() == ErrorIdx)
-            return std::get<ErrorIdx>(m_valueOrError);
-        return static_cast<OtherValue>(std::get<ValueIdx>(m_valueOrError));
-    }
+    bool valid() const;
+    Q_INVOKABLE operator bool() const;
+    QString error() const;
+    QVariant value() const;
 
-    template <typename OtherValue,
-              typename std::enable_if_t<!std::is_integral_v<OtherValue> && !std::is_enum_v<OtherValue> &&
-                                            !std::is_floating_point_v<OtherValue>,
-                                        bool> = true>
-    ResultValue<OtherValue> convertTo() const
+    template <typename T>
+    T value() const
     {
-        if (m_valueOrError.index() == ErrorIdx)
-            return std::get<ErrorIdx>(m_valueOrError);
-        return OtherValue{std::get<ValueIdx>(m_valueOrError)};
-    }
-
-    operator bool() const { return m_valueOrError.index() == ValueIdx; }
-
-    const QString& error() const noexcept(false)
-    {
-        if (m_valueOrError.index() == ValueIdx)
-            throw DerefError("Result is not containing error");
-        return std::get<ErrorIdx>(m_valueOrError).get();
-    }
-
-    // This overload will be called on lvalue instance of the class, so the value returned by reference.
-    const ValueT& value() const& noexcept(false)
-    {
-        if (m_valueOrError.index() == ErrorIdx)
-            throw DerefError(error());
-        return std::get<ValueIdx>(m_valueOrError);
-    }
-
-    // This overload will be called on rvalue instance of the class, so the value should be moved.
-    ValueT value() && noexcept(false)
-    {
-        if (m_valueOrError.index() == ErrorIdx)
-            throw DerefError(error());
-        return std::move(std::get<ValueIdx>(m_valueOrError));
+        return value().value<T>();
     }
 
 private:
-    ValueOrError m_valueOrError;
+    QVariant m_valueOrError;
 };
 
-template <>
-class ResultValue<void>
+Q_DECLARE_METATYPE(ResultValue);
+
+class Result
 {
+    Q_PROPERTY(bool valid READ isValid CONSTANT)
+    Q_PROPERTY(QString error READ error CONSTANT)
+
 public:
-    ResultValue() {}
-    ResultValue(ResultValue&&) = default;
-    ResultValue& operator=(ResultValue&&) = default;
-    ResultValue(const ResultValue&) = default;
-    ResultValue& operator=(const ResultValue&) = default;
+    Result();
+    Result(Result&&) = default;
+    Result& operator=(Result&&) = default;
+    Result(const Result&) = default;
+    Result& operator=(const Result&) = default;
 
-    ResultValue(ResultError&& error)
-        : m_error{std::move(error).get()}
-    {
-    }
+    Result(const ResultError& error);
+    Result(ResultError&& error);
 
-    operator bool() const { return !m_error.has_value(); }
-
-    const QString& error() const
-    {
-        if (!m_error.has_value())
-            throw DerefError("Result is not containing error");
-        return m_error.value();
-    }
-
-    void value() const
-    {
-        if (m_error.has_value())
-            throw DerefError(error());
-    }
+    bool valid() const { return m_error.isNull(); }
+    Q_INVOKABLE operator bool() const { return valid(); }
+    void value() {}
+    QString error() const { return m_error; }
 
 private:
-    std::optional<QString> m_error;
+    QString m_error;
 };
 
-using Result = ResultValue<void>;
+Q_DECLARE_METATYPE(Result);

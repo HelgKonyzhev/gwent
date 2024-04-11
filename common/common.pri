@@ -18,6 +18,7 @@ SOURCES += \
     $$PWD/lobby_state.cpp \
     $$PWD/player.cpp \
     $$PWD/player_data.cpp \
+    $$PWD/result.cpp \
     $$PWD/socket.cpp \
     $$PWD/state.cpp
 

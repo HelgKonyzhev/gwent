@@ -31,7 +31,7 @@ Event* Event::make(Type t)
     return eventCreators[tn]();
 }
 
-ResultValue<Event*> Event::fromJson(const QJsonObject& eventJs)
+ResultValue Event::fromJson(const QJsonObject& eventJs)
 {
     if (!eventJs.contains("type"))
         return ResultError{"\'type\' not specified"};
@@ -51,12 +51,12 @@ ResultValue<Event*> Event::fromJson(const QJsonObject& eventJs)
     }
 }
 
-ResultValue<Event*> Event::fromRawJson(const QByteArray& rawJson)
+ResultValue Event::fromRawJson(const QByteArray& rawJson)
 {
     QJsonParseError error;
     auto json = QJsonDocument::fromJson(rawJson, &error);
     if (error.error != QJsonParseError::NoError)
-        return ResultError{"failed to parse: ", error.error};
+        return ResultError{QString{"failed to parse: %1"}.arg(error.error)};
 
     if (!json.isObject())
         return ResultError{"expected json object"};
