@@ -4,59 +4,29 @@
 RequestGameEvent::RequestGameEvent()
     : Event{RequestGame}
 {
+    qRegisterMetaType<RequestGameEvent>();
 }
 
 RequestGameEvent::RequestGameEvent(const QString& opponent)
     : Event{RequestGame}
     , m_opponent{opponent}
 {
+    qRegisterMetaType<RequestGameEvent>();
 }
 
-Result RequestGameEvent::parse(const QJsonObject& eventJs)
-{
-    if (!eventJs.contains("opponent"))
-        return ResultError{"\'opponent\' not specified"};
-
-    if (!eventJs["opponent"].isString())
-        return ResultError{"\'opponent\' expected to be string"};
-
-    m_opponent = eventJs["opponent"].toString();
-    return {};
-}
-
-QJsonObject RequestGameEvent::toJson() const
-{
-    auto json = Event::toJson();
-    json.insert("opponent", m_opponent);
-    return json;
-}
+REGISTER_EVENT(RequestGameEvent)
 
 GameAcceptedEvent::GameAcceptedEvent()
     : Event{GameAccepted}
 {
+    qRegisterMetaType<GameAcceptedEvent>();
 }
 
 GameAcceptedEvent::GameAcceptedEvent(const QString& opponent)
     : Event{GameAccepted}
     , m_opponent{opponent}
 {
+    qRegisterMetaType<GameAcceptedEvent>();
 }
 
-Result GameAcceptedEvent::parse(const QJsonObject& eventJs)
-{
-    if (!eventJs.contains("opponent"))
-        return ResultError{"\'opponent\' not specified"};
-
-    if (!eventJs["opponent"].isString())
-        return ResultError{"\'opponent\' expected to be string"};
-
-    m_opponent = eventJs["opponent"].toString();
-    return {};
-}
-
-QJsonObject GameAcceptedEvent::toJson() const
-{
-    auto json = Event::toJson();
-    json.insert("opponent", m_opponent);
-    return json;
-}
+REGISTER_EVENT(GameAcceptedEvent)

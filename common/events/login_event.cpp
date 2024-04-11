@@ -4,6 +4,7 @@
 LogInEvent::LogInEvent()
     : Event{Event::LogIn}
 {
+    qRegisterMetaType<LogInEvent>();
 }
 
 LogInEvent::LogInEvent(const QString& username, const QString& password)
@@ -11,67 +12,57 @@ LogInEvent::LogInEvent(const QString& username, const QString& password)
     , m_username{username}
     , m_password{password}
 {
+    qRegisterMetaType<LogInEvent>();
 }
 
-Result LogInEvent::parse(const QJsonObject& eventJs)
-{
-    if (!eventJs.contains("username"))
-        return ResultError{"\'username\' not specified"};
-
-    if (!eventJs["username"].isString())
-        return ResultError{"\'username\' must be string"};
-
-    if (!eventJs.contains("password"))
-        return ResultError{"\'password\' not specified"};
-
-    if (!eventJs["password"].isString())
-        return ResultError{"\'password\' must be string"};
-
-    m_username = eventJs["username"].toString();
-    m_password = eventJs["password"].toString();
-    return {};
-}
-
-QJsonObject LogInEvent::toJson() const
-{
-    auto eventJs = Event::toJson();
-    eventJs.insert("username", {m_username});
-    eventJs.insert("password", {m_password});
-    return eventJs;
-}
+REGISTER_EVENT(LogInEvent)
 
 LoggedInEvent::LoggedInEvent()
     : Event{Event::LoggedIn}
 {
+    qRegisterMetaType<LoggedInEvent>();
 }
 
-LoggedInEvent::LoggedInEvent(const PlayerData& playerData)
+LoggedInEvent::LoggedInEvent(QSharedPointer<PlayerData> playerData)
     : Event{Event::LoggedIn}
     , m_playerData{playerData}
 {
+    qRegisterMetaType<LoggedInEvent>();
 }
 
-Result LoggedInEvent::parse(const QJsonObject& eventJs)
+Result LoggedInEvent::parse(const QVariantHash& eventData)
 {
-    if (!eventJs.contains("player_data"))
+    if (!eventData.contains("player_data"))
         return ResultError{"no \'player_data\' specified"};
 
-    if (!eventJs["player_data"].isObject())
-        return ResultError{"no \'player_data\' expected to be object"};
+    if (!eventData["player_data"].canConvert<QVariantHash>())
+        return ResultError{"\'player_data\' expected to be object"};
 
-    return m_playerData.fromJson(eventJs["player_data"].toObject());
+    m_playerData.reset(new PlayerData);
+    auto parsed = m_playerData->fromVariant(eventData["player_data"].toHash());
+    if (!parsed)
+    {
+        m_playerData.reset();
+        return ResultError{parsed.error()};
+    }
+
+    return {};
 }
 
 QJsonObject LoggedInEvent::toJson() const
 {
     auto eventJs = Event::toJson();
-    eventJs.insert("player_data", m_playerData.toJson());
+    if (m_playerData)
+        eventJs.insert("player_data", m_playerData->toJson());
     return eventJs;
 }
+
+REGISTER_EVENT(LoggedInEvent)
 
 LogInFailedEvent::LogInFailedEvent()
     : Event{Event::LogInFailed}
 {
+    qRegisterMetaType<LogInFailedEvent>();
 }
 
 LogInFailedEvent::LogInFailedEvent(const QString& username, const QString& reason)
@@ -79,32 +70,7 @@ LogInFailedEvent::LogInFailedEvent(const QString& username, const QString& reaso
     , m_username{username}
     , m_reason{reason}
 {
+    qRegisterMetaType<LogInFailedEvent>();
 }
 
-Result LogInFailedEvent::parse(const QJsonObject& eventJs)
-{
-    if (!eventJs.contains("username"))
-        return ResultError{"\'username\' not specified"};
-
-    if (!eventJs["username"].isString())
-        return ResultError{"\'username\' must be string"};
-
-    m_username = eventJs["username"].toString();
-
-    if (!eventJs.contains("reason"))
-        return ResultError{"\'reason\' not specified"};
-
-    if (!eventJs["reason"].isString())
-        return ResultError{"\'reason\' must be string"};
-
-    m_reason = eventJs["reason"].toString();
-    return {};
-}
-
-QJsonObject LogInFailedEvent::toJson() const
-{
-    auto eventJs = Event::toJson();
-    eventJs.insert("username", {m_username});
-    eventJs.insert("reason", {m_reason});
-    return eventJs;
-}
+REGISTER_EVENT(LogInFailedEvent)

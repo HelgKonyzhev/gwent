@@ -5,16 +5,13 @@ class ErrorEvent : public Event
 {
 public:
     ErrorEvent();
-    ErrorEvent(const QString& username);
+    ErrorEvent(const QString& description);
 
-    void setDescription(const QString& username) { m_description = username; }
+    void setDescription(const QString& description) { m_description = description; }
     const QString& description() const { return m_description; }
-
-    Result parse(const QJsonObject& eventJs);
-    QJsonObject toJson() const;
 
 private:
     QString m_description;
 };
 
-TO_TYPE_ID(ErrorEvent, Event::LogIn);
+DECLARE_EVENT(ErrorEvent, Event::Error);

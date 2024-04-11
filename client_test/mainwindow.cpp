@@ -103,28 +103,28 @@ MainWindow::MainWindow(QWidget* parent)
     m_layout->addWidget(startGameButton, 1, 6);
 
     {
-        QHBoxLayout* cardsLayout = new QHBoxLayout;
-        auto cardsData = CardsData::instance();
+        //        QHBoxLayout* cardsLayout = new QHBoxLayout;
+        //        auto cardsData = CardsData::instance();
 
-        QHash<QString, QVariantList> filters;
-        filters["tags"] = {"leader"};
-        const auto filtered = cardsData->cards().get(filters);
+        //        QHash<QString, QVariantList> filters;
+        //        filters["tags"] = {"leader"};
+        //        const auto filtered = cardsData->cards().get(filters);
 
-        for (const auto card : filtered)
-        {
-            auto imgPath = QString(":/%1").arg(card->image());
-            QPixmap pic;
-            auto res = pic.load(imgPath);
-            if (!res)
-            {
-                qDebug() << "failed" << imgPath;
-                continue;
-            }
+        //        for (const auto card : filtered)
+        //        {
+        //            auto imgPath = QString(":/%1").arg(card->image());
+        //            QPixmap pic;
+        //            auto res = pic.load(imgPath);
+        //            if (!res)
+        //            {
+        //                qDebug() << "failed" << imgPath;
+        //                continue;
+        //            }
 
-            auto l = new QLabel{this};
-            l->setPixmap(pic);
-            cardsLayout->addWidget(l);
-        }
+        //            auto l = new QLabel{this};
+        //            l->setPixmap(pic);
+        //            cardsLayout->addWidget(l);
+        //        }
 
         //        for (const auto cardData : cardsData->cards().getAll())
         //        {
@@ -142,15 +142,15 @@ MainWindow::MainWindow(QWidget* parent)
         //            cardsLayout->addWidget(l);
         //        }
 
-        m_layout->addItem(cardsLayout, 0, 7);
+        //        m_layout->addItem(cardsLayout, 0, 7);
     }
 
     connect(m_socket, &Socket::eventRecieved, this, &MainWindow::onEventRecieved);
-
-    connect(m_player->thresholdState(), &DoorstepState::registered, this, &MainWindow::onRegistered);
-    connect(m_player->thresholdState(), &DoorstepState::registrationFailed, this,
+    
+    connect(m_player->doorstepState(), &DoorstepState::registered, this, &MainWindow::onRegistered);
+    connect(m_player->doorstepState(), &DoorstepState::registrationFailed, this,
             &MainWindow::onRegistrationFailed);
-    connect(m_player->thresholdState(), &DoorstepState::loginFailed, this, &MainWindow::onLogInFailed);
+    connect(m_player->doorstepState(), &DoorstepState::loginFailed, this, &MainWindow::onLogInFailed);
 
     connect(m_player->lobbyState(), &LobbyState::loggedIn, this, &MainWindow::onLoggedIn);
     connect(m_player->lobbyState(), &LobbyState::lobbyUpdated, this, &MainWindow::onLobbyUpdated);
@@ -168,6 +168,7 @@ void MainWindow::onConnectClicked(bool)
     url.setScheme("ws");
     url.setHost("localhost");
     url.setPort(8888);
+    qDebug() << url;
     m_socket->open(url);
 }
 
@@ -213,7 +214,7 @@ void MainWindow::onRegistered(RegisteredEvent* event)
 
 void MainWindow::onLoggedIn(LoggedInEvent* event)
 {
-    m_statusLabel->setText(QString{"User \'%1\' logged in"}.arg(event->playerData().name()));
+    m_statusLabel->setText(QString{"User \'%1\' logged in"}.arg(event->playerData()->name()));
 }
 
 void MainWindow::onLogInFailed(LogInFailedEvent* event)
@@ -255,8 +256,7 @@ void MainWindow::onGameRequested(RequestGameEvent* event)
     }
     else
     {
-        m_player->postEvent(
-            new GameStartFailedEvent{QString{"declined by %1"}.arg(m_player->data()->name())});
+        m_player->postEvent(new GameStartFailedEvent{QString{"declined by %1"}.arg(m_player->data()->name())});
     }
 }
 

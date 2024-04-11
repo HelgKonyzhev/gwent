@@ -19,8 +19,8 @@ public:
 
 signals:
     void eventRecieved(Event* event);
-    void connected();
-    void disconnected();
+    Q_INVOKABLE void connected();
+    Q_INVOKABLE void disconnected();
 
 private:
     void onTextMessageRecieved(const QString& message);

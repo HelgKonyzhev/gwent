@@ -11,6 +11,8 @@ LobbyState::LobbyState(Socket *socket, QState *parent)
     : State{parent}
     , m_socket{socket}
 {
+    qRegisterMetaType<LobbyState>();
+
     setObjectName("lobbyState");
 
     auto initialState = new State{this};
@@ -22,8 +24,12 @@ LobbyState::LobbyState(Socket *socket, QState *parent)
     setInitialState(initialState);
 
     connect(initialState, &State::entered, this,
-            [this](Event *event)
+            [this](QEvent *qevent)
             {
+                auto event = castToEvent(qevent);
+                if (!event)
+                    return;
+
                 switch (static_cast<Event::Type>(event->type()))
                 {
                     case Event::LoggedIn:
@@ -45,8 +51,12 @@ LobbyState::LobbyState(Socket *socket, QState *parent)
     startingGameState->setObjectName("startingGameState");
 
     connect(startingGameState, &State::entered, this,
-            [this](Event *event)
+            [this](QEvent *qevent)
             {
+                auto event = castToEvent(qevent);
+                if (!event)
+                    return;
+
                 switch (static_cast<Event::Type>(event->type()))
                 {
                     case Event::StartGame:
@@ -65,19 +75,19 @@ LobbyState::LobbyState(Socket *socket, QState *parent)
     gameState->setObjectName("gameState");
 
     connect(gameState, &State::entered, this,
-            [this](Event *event) { emit gameStarted(event->to<GameStartedEvent>()); });
+            [this](QEvent *qevent) { emit gameStarted(castToEvent(qevent)->to<GameStartedEvent>()); });
 
     auto updateLobbyTrans = new EventTransition{m_socket, Event::UpdateLobby};
 
     connect(updateLobbyTrans, &EventTransition::triggered, this,
-            [this](Event *event) { emit updatingLobby(event->to<UpdateLobbyEvent>()); });
+            [this](QEvent *qevent) { emit updatingLobby(castToEvent(qevent)->to<UpdateLobbyEvent>()); });
 
     auto lobbyUpdatedTrans = new EventTransition{m_socket, Event::LobbyUpdated};
 
     connect(lobbyUpdatedTrans, &EventTransition::triggered, this,
-            [this](Event *event)
+            [this](QEvent *qevent)
             {
-                auto e = event->to<LobbyUpdatedEvent>();
+                auto e = castToEvent(qevent)->to<LobbyUpdatedEvent>();
                 emit lobbyUpdated(e);
             });
 

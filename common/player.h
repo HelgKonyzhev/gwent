@@ -1,7 +1,8 @@
 #pragma once
 #include <QObject>
 #include <common/player_data.h>
-#include <optional>
+#include <QMetaType>
+#include <QSharedPointer>
 
 class Socket;
 class RegisterEvent;
@@ -23,9 +24,15 @@ class GameDeclinedEvent;
 class DoorstepState;
 class LobbyState;
 
+Q_DECLARE_OPAQUE_POINTER(DoorstepState*);
+Q_DECLARE_OPAQUE_POINTER(LobbyState*);
+
 class Player : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QSharedPointer<PlayerData> data READ data CONSTANT)
+    Q_PROPERTY(DoorstepState* doorstepState READ doorstepState CONSTANT)
+    Q_PROPERTY(LobbyState* lobbyState READ lobbyState CONSTANT)
 
 public:
     Player(Socket* socket, QObject* parent = nullptr);
@@ -34,33 +41,29 @@ public:
     void postEvent(Event* event);
 
     bool inLobby() const { return m_inLobby; }
-    const std::optional<PlayerData>& data() const { return m_data; }
-    const std::optional<QStringList>& playersInLobby() const { return m_playersInLobby; }
+    const QSharedPointer<PlayerData> data() const { return m_data; }
+    const QStringList& playersInLobby() const { return m_playersInLobby; }
 
-    const DoorstepState* thresholdState() const { return m_thresholdState; }
-    const LobbyState* lobbyState() const { return m_lobbyState; }
+    DoorstepState* doorstepState() const { return m_doorstepState; }
+    LobbyState* lobbyState() const { return m_lobbyState; }
+
+    Q_INVOKABLE void login(const QString& username, const QString& password);
+    Q_INVOKABLE void registerPlayer(const QString& username, const QString& password);
 
 signals:
-    //    void registration(RegisterEvent* event);
-    //    void registered(RegisteredEvent* event);
-    //    void registrationFailed(RegistrationFailedEvent* event);
-    //    void logging(LogInEvent* event);
-    //    void loggedIn(LoggedInEvent* event);
-    //    void loginFailed(LogInFailedEvent* event);
-    //    void updatingLobby(UpdateLobbyEvent* event);
-    //    void lobbyUpdated(LobbyUpdatedEvent* event);
-    //    void startingGame(StartGameEvent* event);
-    //    void gameStartFailed(GameStartFailedEvent* event);
-    //    void gameStarted(GameStartedEvent* event);
-    //    void gameRequested(RequestGameEvent* event);
-    //    void gameAccepted(GameAcceptedEvent* event);
+    Q_INVOKABLE void loggedIn(const LoggedInEvent*);
+    Q_INVOKABLE void loginFailed(const LogInFailedEvent*);
+    Q_INVOKABLE void registered(const RegisteredEvent*);
+    Q_INVOKABLE void registrationFailed(const RegistrationFailedEvent*);
 
 private:
     QStateMachine* m_fsm;
     Socket* m_socket;
     bool m_inLobby = false;
-    std::optional<PlayerData> m_data;
-    std::optional<QStringList> m_playersInLobby;
-    DoorstepState* m_thresholdState;
+    QSharedPointer<PlayerData> m_data;
+    QStringList m_playersInLobby;
+    DoorstepState* m_doorstepState;
     LobbyState* m_lobbyState;
 };
+
+Q_DECLARE_METATYPE(Player);

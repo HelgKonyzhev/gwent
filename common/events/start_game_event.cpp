@@ -4,98 +4,44 @@
 StartGameEvent::StartGameEvent()
     : Event{StartGame}
 {
+    qRegisterMetaType<StartGameEvent>();
 }
 
 StartGameEvent::StartGameEvent(const QString& opponent)
     : Event{StartGame}
     , m_opponent{opponent}
 {
+    qRegisterMetaType<StartGameEvent>();
 }
 
-Result StartGameEvent::parse(const QJsonObject& eventJs)
-{
-    if (!eventJs.contains("opponent"))
-        return ResultError{"\'opponent\' not specified"};
-
-    if (!eventJs["opponent"].isString())
-        return ResultError{"\'opponent\' expected to be string"};
-
-    m_opponent = eventJs["opponent"].toString();
-    return {};
-}
-
-QJsonObject StartGameEvent::toJson() const
-{
-    auto json = Event::toJson();
-    json.insert("opponent", m_opponent);
-    return json;
-}
+REGISTER_EVENT(StartGameEvent)
 
 GameStartedEvent::GameStartedEvent()
     : Event{GameStarted}
 {
+    qRegisterMetaType<GameStartedEvent>();
 }
 
 GameStartedEvent::GameStartedEvent(const QString& opponent)
     : Event{GameStarted}
     , m_opponent{opponent}
 {
+    qRegisterMetaType<GameStartedEvent>();
 }
 
-Result GameStartedEvent::parse(const QJsonObject& eventJs)
-{
-    if (!eventJs.contains("opponent"))
-        return ResultError{"\'opponent\' not specified"};
-
-    if (!eventJs["opponent"].isString())
-        return ResultError{"\'opponent\' expected to be string"};
-
-    m_opponent = eventJs["opponent"].toString();
-    return {};
-}
-
-QJsonObject GameStartedEvent::toJson() const
-{
-    auto json = Event::toJson();
-    json.insert("opponent", m_opponent);
-    return json;
-}
+REGISTER_EVENT(GameStartedEvent)
 
 GameStartFailedEvent::GameStartFailedEvent()
     : Event{GameStartFailed}
 {
+    qRegisterMetaType<GameStartFailedEvent>();
 }
 
 GameStartFailedEvent::GameStartFailedEvent(const QString& reason)
     : Event{GameStartFailed}
     , m_reason{reason}
 {
+    qRegisterMetaType<GameStartFailedEvent>();
 }
 
-Result GameStartFailedEvent::parse(const QJsonObject& eventJs)
-{
-    //    if (!eventJs.contains("player1"))
-    //        return ResultError{"\'player1\' not specified"};
-
-    //    if (!eventJs["player1"].isString())
-    //        return ResultError{"\'player1\' expected to be string"};
-
-    //    m_player1 = eventJs["player1"].toString();
-
-    //    if (!eventJs.contains("player2"))
-    //        return ResultError{"\'player2\' not specified"};
-
-    //    if (!eventJs["player2"].isString())
-    //        return ResultError{"\'player2\' expected to be string"};
-
-    //    m_player2 = eventJs["player2"].toString();
-    return {};
-}
-
-QJsonObject GameStartFailedEvent::toJson() const
-{
-    auto json = Event::toJson();
-    //    json.insert("player1", m_player1);
-    //    json.insert("player2", m_player2);
-    return json;
-}
+REGISTER_EVENT(GameStartFailedEvent)

@@ -4,26 +4,14 @@
 ErrorEvent::ErrorEvent()
     : Event{Event::Error}
 {
+    qRegisterMetaType<ErrorEvent>();
 }
 
-ErrorEvent::ErrorEvent(const QString& username)
+ErrorEvent::ErrorEvent(const QString& description)
     : Event{Event::Error}
-    , m_description{username}
+    , m_description{description}
 {
+    qRegisterMetaType<ErrorEvent>();
 }
 
-Result ErrorEvent::parse(const QJsonObject& eventJs)
-{
-    if (!eventJs.contains("description"))
-        return ResultError{"\'description\' not specified"};
-
-    m_description = eventJs["description"].toString();
-    return {};
-}
-
-QJsonObject ErrorEvent::toJson() const
-{
-    auto eventJs = Event::toJson();
-    eventJs.insert("description", {m_description});
-    return eventJs;
-}
+REGISTER_EVENT(ErrorEvent)

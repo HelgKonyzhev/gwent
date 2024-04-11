@@ -12,7 +12,7 @@ size_t qHash(const QVariant& v)
     return 0;
 }
 
-CardsSet::CardsSet() {}
+CardsSet::CardsSet() { qRegisterMetaType<CardsSet>(); }
 
 bool CardsSet::add(const CardData* card)
 {
@@ -83,6 +83,13 @@ QSet<const CardData*> CardsSet::get(const QHash<QString, QVariantList>& filters)
     return res;
 }
 
+QSet<const CardData*> CardsSet::get(const QString& filter, const QVariantList& values) const
+{
+    QHash<QString, QVariantList> filters;
+    filters[filter] = values;
+    return get(filters);
+}
+
 const CardData* CardsSet::get(const QString& cardName) const
 {
     auto filterIt = m_cards.find("name");
@@ -98,3 +105,39 @@ const CardData* CardsSet::get(const QString& cardName) const
 
     return *valuesIt.value().begin();
 }
+
+bool CardsSet::erase(const QString& cardName)
+{
+    auto card = CardsData::instance()->cards().get(cardName);
+    if (!card)
+        return false;
+
+    auto cardIt = m_all.find(card);
+    if (cardIt == m_all.end())
+        return false;
+
+    for (auto filterIt = m_cards.begin(); filterIt != m_cards.end();)
+    {
+        for (auto valueIt = filterIt.value().begin(); valueIt != filterIt.value().end();)
+        {
+            auto cardIt = valueIt.value().find(card);
+            if (cardIt != valueIt.value().end())
+                valueIt.value().erase(cardIt);
+
+            if (valueIt.value().empty())
+                valueIt = filterIt.value().erase(valueIt);
+            else
+                ++valueIt;
+        }
+
+        if (filterIt.value().empty())
+            filterIt = m_cards.erase(filterIt);
+        else
+            ++filterIt;
+    }
+
+    m_all.erase(cardIt);
+    return true;
+}
+
+bool CardsSet::erase(const CardData* card) { return erase(card->name()); }

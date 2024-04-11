@@ -5,19 +5,22 @@
 #include <QFile>
 #include <shared_mutex>
 #include <common/result.h>
+#include <QObject>
+#include <QSharedPointer>
 
-class PlayerStore
+class PlayerStore : public QObject
 {
 public:
     PlayerStore();
     ~PlayerStore();
 
     bool load();
-    Result add(const PlayerData& user);
-    ResultValue<PlayerData> get(const QString& username, const QString& password);
+    Result add(const QString& playerName, const QString& password);
+    ResultValue<QSharedPointer<PlayerData>> get(const QString& username, const QString& password);
 
 private:
-    QFile m_usersFile;
-    QJsonDocument m_usersJson;
+    Result save();
+
     std::shared_mutex m_mtx;
+    QHash<QString, QSharedPointer<PlayerData>> m_players;
 };

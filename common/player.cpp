@@ -19,16 +19,20 @@ Player::Player(Socket *socket, QObject *parent)
     : QObject{parent}
     , m_fsm{new QStateMachine{this}}
     , m_socket{socket}
-    , m_thresholdState{new DoorstepState{m_socket, m_fsm}}
+    , m_doorstepState{new DoorstepState{m_socket, m_fsm}}
     , m_lobbyState{new LobbyState{m_socket, m_fsm}}
 {
+    qRegisterMetaType<Player>();
 
-    m_fsm->setInitialState(m_thresholdState);
+    connect(m_socket, &Socket::connected, m_fsm, &QStateMachine::start);
+    connect(m_socket, &Socket::disconnected, m_fsm, &QStateMachine::stop);
 
-    m_thresholdState->addTransition(new EventTransition{m_socket, Event::LoggedIn, m_lobbyState});
+    m_fsm->setInitialState(m_doorstepState);
 
-    connect(m_lobbyState, &State::entered, this, [this](Event *) { m_inLobby = true; });
-    connect(m_lobbyState, &State::exited, this, [this](Event *) { m_inLobby = false; });
+    m_doorstepState->addTransition(new EventTransition{m_socket, Event::LoggedIn, m_lobbyState});
+
+    connect(m_lobbyState, &State::entered, this, [this](QEvent *) { m_inLobby = true; });
+    connect(m_lobbyState, &State::exited, this, [this](QEvent *) { m_inLobby = false; });
 
     connect(m_lobbyState, &LobbyState::loggedIn, this,
             [this](LoggedInEvent *event) { m_data = event->playerData(); });
@@ -43,157 +47,28 @@ Player::Player(Socket *socket, QObject *parent)
                 m_fsm->postEvent(e);
             });
 
-    connect(m_socket, &Socket::connected, m_fsm, &QStateMachine::start);
-    connect(m_socket, &Socket::disconnected, m_fsm, &QStateMachine::stop);
+    connect(m_lobbyState, &LobbyState::loggedIn, this, &Player::loggedIn);
+    connect(m_doorstepState, &DoorstepState::loginFailed, this, &Player::loginFailed);
+
+    connect(m_doorstepState, &DoorstepState::registered, this, &Player::registered);
+    connect(m_doorstepState, &DoorstepState::registrationFailed, this, &Player::registrationFailed);
 
     if (m_socket->state() == QAbstractSocket::ConnectedState)
         m_fsm->start();
-
-    //    auto initState = new State{m_fsm};
-    //    initState->setObjectName("initState");
-
-    //    connect(initState, &State::entered, this,
-    //            [this](Event *event)
-    //            {
-    //                switch (static_cast<Event::Type>(event->type()))
-    //                {
-    //                    case Event::Registered:
-    //                        emit registered(event->to<RegisteredEvent>());
-    //                        break;
-    //                    case Event::RegistrationFailed:
-    //                        emit registrationFailed(event->to<RegistrationFailedEvent>());
-    //                        break;
-    //                    case Event::LogInFailed:
-    //                        emit loginFailed(event->to<LogInFailedEvent>());
-    //                        break;
-    //                    default:
-    //                        qDebug() << "unexpected event" << event->type();
-    //                        break;
-    //                }
-    //            });
-
-    //    auto registrationState = new State{m_fsm};
-    //    registrationState->setObjectName("registrationState");
-
-    //    connect(registrationState, &State::entered, this,
-    //            [this](Event *event) { emit registration(event->to<RegisterEvent>()); });
-
-    //    auto loggingInState = new State{m_fsm};
-    //    loggingInState->setObjectName("loggingInState");
-
-    //    connect(loggingInState, &State::entered, this,
-    //            [this](Event *event) { emit logging(event->to<LogInEvent>()); });
-
-    //    auto lobbyState = new State{m_fsm};
-    //    lobbyState->setObjectName("lobbyState");
-
-    //    connect(lobbyState, &State::entered, this,
-    //            [this](Event *event)
-    //            {
-    //                switch (static_cast<Event::Type>(event->type()))
-    //                {
-    //                    case Event::LoggedIn:
-    //                    {
-    //                        auto e = event->to<LoggedInEvent>();
-    //                        m_data = e->playerData();
-    //                        emit loggedIn(e);
-    //                        m_inLobby = true;
-    //                        break;
-    //                    }
-    //                    case Event::GameStartFailed:
-    //                        emit gameStartFailed(event->to<GameStartFailedEvent>());
-    //                        break;
-    //                    default:
-    //                        qDebug() << "unexpected event" << event->type();
-    //                        break;
-    //                };
-    //            });
-
-    //    connect(lobbyState, &State::exited, this, [this](Event *) { m_inLobby = false; });
-
-    //    auto startingGameState = new State{m_fsm};
-    //    startingGameState->setObjectName("startingGameState");
-
-    //    connect(startingGameState, &State::entered, this,
-    //            [this](Event *event)
-    //            {
-    //                switch (static_cast<Event::Type>(event->type()))
-    //                {
-    //                    case Event::StartGame:
-    //                        emit startingGame(event->to<StartGameEvent>());
-    //                        break;
-    //                    case Event::RequestGame:
-    //                        emit gameRequested(event->to<RequestGameEvent>());
-    //                        break;
-    //                    default:
-    //                        qDebug() << "unexpected event" << event->type();
-    //                        break;
-    //                }
-    //            });
-
-    //    auto gameState = new State(m_fsm);
-    //    gameState->setObjectName("gameState");
-
-    //    connect(gameState, &State::entered, this,
-    //            [this](Event *event) { emit gameStarted(event->to<GameStartedEvent>()); });
-
-    //    initState->addTransition(new EventTransition{m_socket, Event::Register, registrationState});
-    //    initState->addTransition(new EventTransition{m_socket, Event::LogIn, loggingInState});
-
-    //    registrationState->addTransition(new EventTransition{m_socket, Event::RegistrationFailed,
-    //    initState}); registrationState->addTransition(new EventTransition{m_socket, Event::Registered,
-    //    initState});
-
-    //    loggingInState->addTransition(new EventTransition{m_socket, Event::LoggedIn, lobbyState});
-    //    loggingInState->addTransition(new EventTransition{m_socket, Event::LogInFailed, initState});
-
-    //    auto updateLobbyTrans = new EventTransition{m_socket, Event::UpdateLobby};
-
-    //    connect(updateLobbyTrans, &EventTransition::triggered, this,
-    //            [this](Event *event) { emit updatingLobby(event->to<UpdateLobbyEvent>()); });
-
-    //    auto lobbyUpdatedTrans = new EventTransition{m_socket, Event::LobbyUpdated};
-
-    //    connect(lobbyUpdatedTrans, &EventTransition::triggered, this,
-    //            [this](Event *event)
-    //            {
-    //                auto e = event->to<LobbyUpdatedEvent>();
-    //                m_playersInLobby = e->players();
-    //                emit lobbyUpdated(e);
-    //            });
-
-    //    lobbyState->addTransition(updateLobbyTrans);
-    //    lobbyState->addTransition(lobbyUpdatedTrans);
-    //    lobbyState->addTransition(new EventTransition{m_socket, Event::StartGame, startingGameState});
-    //    lobbyState->addTransition(new EventTransition{m_socket, Event::RequestGame, startingGameState});
-
-    //    auto gameAcceptedTrans = new EventTransition{m_socket, Event::GameAccepted};
-
-    //    connect(gameAcceptedTrans, &EventTransition::triggered, this,
-    //            [this](Event *event) { emit gameAccepted(event->to<GameAcceptedEvent>()); });
-
-    //    startingGameState->addTransition(new EventTransition{m_socket, Event::GameStarted, gameState});
-    //    startingGameState->addTransition(new EventTransition{m_socket, Event::GameStartFailed, lobbyState});
-    //    startingGameState->addTransition(gameAcceptedTrans);
-
-    //    m_fsm->setInitialState(initState);
-
-    //    connect(m_socket, &Socket::eventRecieved, this,
-    //            [this](Event *e)
-    //            {
-    //                e->setSource(m_socket);
-    //                m_fsm->postEvent(e);
-    //            });
-
-    //    connect(m_socket, &Socket::connected, m_fsm, &QStateMachine::start);
-    //    connect(m_socket, &Socket::disconnected, m_fsm, &QStateMachine::stop);
-
-    //    if (m_socket->state() == QAbstractSocket::ConnectedState)
-    //        m_fsm->start();
 }
 
 void Player::postEvent(Event *event)
 {
     event->setSource(this);
     m_fsm->postEvent(event);
+}
+
+void Player::login(const QString &username, const QString &password)
+{
+    postEvent(new LogInEvent{username, password});
+}
+
+void Player::registerPlayer(const QString &username, const QString &password)
+{
+    postEvent(new RegisterEvent{username, password});
 }

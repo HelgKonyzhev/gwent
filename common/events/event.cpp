@@ -1,53 +1,34 @@
 #include "event.h"
 #include <QJsonObject>
 #include <QJsonDocument>
-#include "login_event.h"
-#include "register_event.h"
-#include "error_event.h"
-#include "lobby_updated_event.h"
-#include "start_game_event.h"
-#include "request_game_event.h"
+#include <QMetaProperty>
+
+std::vector<Event::EventCreator> Event::m_eventCreators;
+
+void Event::registerEvent(Type tid, EventCreator creator)
+{
+    auto& eventCreators = m_eventCreators;
+
+    const auto tn = typeNum(tid);
+    if (tn >= eventCreators.size())
+        eventCreators.resize(tn + 1);
+    eventCreators[tn] = creator;
+}
 
 Event::Event(Type t)
     : QEvent{static_cast<QEvent::Type>(t)}
 {
+    qRegisterMetaType<Event>();
 }
 
 Event* Event::make(Type t)
 {
-    switch (t)
-    {
-        case LogIn:
-            return new LogInEvent();
-        case Register:
-            return new RegisterEvent();
-        case Error:
-            return new ErrorEvent();
-        case Registered:
-            return new RegisteredEvent();
-        case LoggedIn:
-            return new LoggedInEvent();
-        case LogInFailed:
-            return new LogInFailedEvent();
-        case RegistrationFailed:
-            return new RegistrationFailedEvent();
-        case LobbyUpdated:
-            return new LobbyUpdatedEvent();
-        case UpdateLobby:
-            return new UpdateLobbyEvent();
-        case StartGame:
-            return new StartGameEvent();
-        case GameStarted:
-            return new GameStartedEvent();
-        case GameStartFailed:
-            return new GameStartFailedEvent();
-        case RequestGame:
-            return new RequestGameEvent();
-        case GameAccepted:
-            return new GameAcceptedEvent();
-        default:
-            return nullptr;
-    };
+    auto& eventCreators = m_eventCreators;
+
+    const auto tn = typeNum(t);
+    if (tn > eventCreators.size())
+        return nullptr;
+    return eventCreators[tn]();
 }
 
 ResultValue<Event*> Event::fromJson(const QJsonObject& eventJs)
@@ -83,10 +64,55 @@ ResultValue<Event*> Event::fromRawJson(const QByteArray& rawJson)
     return fromJson(json.object());
 }
 
+Result Event::parse(const QJsonObject& eventJs) { return parse(eventJs.toVariantHash()); }
+
+Result Event::parse(const QVariantHash& eventData)
+{
+    for (int i = 0; i < metaObject()->propertyCount(); ++i)
+    {
+        auto property = metaObject()->property(i);
+        if (strcmp(property.name(), "objectName") == 0)
+            continue;
+
+        if (!eventData.contains(property.name()))
+            return ResultError{QString{"\'%1\' not specified"}.arg(property.name())};
+
+        const auto propertyTid = property.typeId();
+        const auto dataTid = eventData[property.name()].typeId();
+
+        if (dataTid == propertyTid)
+        {
+            property.write(this, eventData[property.name()]);
+        }
+        else if (propertyTid == QMetaType::QStringList && dataTid == QMetaType::QVariantList)
+        {
+            property.write(this, eventData[property.name()].toStringList());
+        }
+        else
+        {
+            return ResultError{QString{"\'%1\' must be of type %2, but it is of type %3"}
+                                   .arg(property.name())
+                                   .arg(property.typeName())
+                                   .arg(eventData[property.name()].typeName())};
+        }
+    }
+    return {};
+}
+
 QJsonObject Event::toJson() const
 {
     QJsonObject eventJs;
     eventJs.insert("type", {type()});
+
+    for (int i = 0; i < metaObject()->propertyCount(); ++i)
+    {
+        auto property = metaObject()->property(i);
+        if (strcmp(property.name(), "objectName") == 0)
+            continue;
+
+        eventJs[property.name()] = property.read(this).toJsonValue();
+    }
+
     return eventJs;
 }
 

@@ -5,6 +5,7 @@
 LobbyUpdatedEvent::LobbyUpdatedEvent()
     : Event{LobbyUpdated}
 {
+    qRegisterMetaType<LobbyUpdatedEvent>();
 }
 
 LobbyUpdatedEvent::LobbyUpdatedEvent(const QStringList& players)
@@ -13,28 +14,12 @@ LobbyUpdatedEvent::LobbyUpdatedEvent(const QStringList& players)
 {
 }
 
-Result LobbyUpdatedEvent::parse(const QJsonObject& eventJs)
-{
-    if (!eventJs.contains("players"))
-        return ResultError{"\'players\' not specified"};
-
-    if (!eventJs["players"].isArray())
-        return ResultError{"\'players\' expected to be array"};
-
-    m_players = eventJs["players"].toVariant().toStringList();
-    return {};
-}
-
-QJsonObject LobbyUpdatedEvent::toJson() const
-{
-    auto json = Event::toJson();
-    json.insert("players", QJsonArray::fromStringList(m_players));
-    return json;
-}
+REGISTER_EVENT(LobbyUpdatedEvent)
 
 UpdateLobbyEvent::UpdateLobbyEvent()
     : Event{UpdateLobby}
 {
+    qRegisterMetaType<UpdateLobbyEvent>();
 }
 
-Result UpdateLobbyEvent::parse(const QJsonObject& /*eventJs*/) { return {}; }
+REGISTER_EVENT(UpdateLobbyEvent)

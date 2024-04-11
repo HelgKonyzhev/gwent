@@ -36,9 +36,9 @@ void Server::onNewConnection()
 
     connect(player->socket(), &Socket::disconnected, player, [player, this]() { onDisconnected(player); });
 
-    connect(player->thresholdState(), &DoorstepState::logging, this,
+    connect(player->doorstepState(), &DoorstepState::logging, this,
             [this, player](LogInEvent* event) { onLoggingIn(player, event); });
-    connect(player->thresholdState(), &DoorstepState::registration, this,
+    connect(player->doorstepState(), &DoorstepState::registration, this,
             [this, player](RegisterEvent* event) { onRegistration(player, event); });
     connect(player->lobbyState(), &LobbyState::loggedIn, this,
             [this, player](LoggedInEvent* event) { onLoggedIn(player, event); });
@@ -72,7 +72,7 @@ void Server::onLoggingIn(Player* player, LogInEvent* event)
 
 void Server::onRegistration(Player* player, RegisterEvent* event)
 {
-    if (const auto res = m_users.add({event->username(), event->password()}); !res)
+    if (const auto res = m_users.add(event->username(), event->password()); !res)
         player->postEvent(new RegistrationFailedEvent{event->username(), res.error()});
     else
         player->postEvent(new RegisteredEvent{event->username()});
@@ -107,7 +107,7 @@ void Server::onDisconnected(Player* player)
 {
     m_players.remove(player);
 
-    if (player->data().has_value())
+    if (player->data())
     {
         m_loggedPlayers.remove(player->data()->name());
         m_waitingPlayers.remove(player->data()->name());

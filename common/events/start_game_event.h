@@ -1,8 +1,13 @@
 #pragma once
 #include "event.h"
+#include <QtQml/qqmlregistration.h>
 
 class StartGameEvent : public Event
 {
+    Q_OBJECT
+    QML_ELEMENT
+    Q_PROPERTY(QString opponent READ opponent WRITE setOpponent)
+
 public:
     StartGameEvent();
     StartGameEvent(const QString& opponent);
@@ -10,17 +15,18 @@ public:
     void setOpponent(const QString& player) { m_opponent = player; }
     const QString& opponent() const { return m_opponent; }
 
-    Result parse(const QJsonObject& eventJs) override;
-    QJsonObject toJson() const override;
-
 private:
     QString m_opponent;
 };
 
-TO_TYPE_ID(StartGameEvent, Event::StartGame);
+DECLARE_EVENT(StartGameEvent, Event::StartGame);
 
 class GameStartedEvent : public Event
 {
+    Q_OBJECT
+    QML_ELEMENT
+    Q_PROPERTY(QString opponent READ opponent WRITE setOpponent)
+
 public:
     GameStartedEvent();
     GameStartedEvent(const QString& opponent);
@@ -28,17 +34,18 @@ public:
     void setOpponent(const QString& player) { m_opponent = player; }
     const QString& opponent() const { return m_opponent; }
 
-    Result parse(const QJsonObject& eventJs) override;
-    QJsonObject toJson() const override;
-
 private:
     QString m_opponent;
 };
 
-TO_TYPE_ID(GameStartedEvent, Event::GameStarted);
+DECLARE_EVENT(GameStartedEvent, Event::GameStarted);
 
 class GameStartFailedEvent : public Event
 {
+    Q_OBJECT
+    QML_ELEMENT
+    Q_PROPERTY(QString reason READ reason WRITE setReason)
+
 public:
     GameStartFailedEvent();
     GameStartFailedEvent(const QString& reason);
@@ -46,11 +53,8 @@ public:
     void setReason(const QString& reason) { m_reason = reason; }
     const QString& reason() const { return m_reason; }
 
-    Result parse(const QJsonObject& eventJs) override;
-    QJsonObject toJson() const override;
-
 private:
     QString m_reason;
 };
 
-TO_TYPE_ID(GameStartFailedEvent, Event::GameStartFailed);
+DECLARE_EVENT(GameStartFailedEvent, Event::GameStartFailed);

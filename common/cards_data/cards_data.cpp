@@ -20,6 +20,8 @@ CardsData* CardsData::instance()
 
 CardsData::CardsData()
 {
+    qRegisterMetaType<CardsData>();
+
     QFile cardsDataFile{QString{":/%1"}.arg(CardsDataPath)};
     if (!cardsDataFile.open(QIODevice::ReadOnly))
     {

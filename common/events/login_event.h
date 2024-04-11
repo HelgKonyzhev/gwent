@@ -1,9 +1,17 @@
 #pragma once
 #include "event.h"
 #include <common/player_data.h>
+#include <QMetaType>
+#include <QtQml/qqmlregistration.h>
+#include <QSharedPointer>
 
 class LogInEvent : public Event
 {
+    Q_OBJECT
+    QML_ELEMENT
+    Q_PROPERTY(QString username READ username WRITE setUsername)
+    Q_PROPERTY(QString password READ password WRITE setPassword);
+
 public:
     LogInEvent();
     LogInEvent(const QString& username, const QString& password);
@@ -14,36 +22,41 @@ public:
     void setPassword(const QString& password) { m_password = password; }
     const QString& password() const { return m_password; }
 
-    Result parse(const QJsonObject& eventJs) override;
-    QJsonObject toJson() const override;
-
 private:
     QString m_username;
     QString m_password;
 };
 
-TO_TYPE_ID(LogInEvent, Event::LogIn);
+DECLARE_EVENT(LogInEvent, Event::LogIn);
 
 class LoggedInEvent : public Event
 {
+    Q_OBJECT
+    QML_ELEMENT
+
 public:
     LoggedInEvent();
-    LoggedInEvent(const PlayerData& playerData);
+    LoggedInEvent(QSharedPointer<PlayerData> playerData);
 
-    void setPlayerData(const PlayerData& playerData) { m_playerData = playerData; }
-    const PlayerData& playerData() const { return m_playerData; }
+    void setPlayerData(QSharedPointer<PlayerData> playerData) { m_playerData = playerData; }
+    Q_INVOKABLE QSharedPointer<PlayerData> playerData() const { return m_playerData; }
 
-    Result parse(const QJsonObject& eventJs) override;
+    Result parse(const QVariantHash& eventData) override;
     QJsonObject toJson() const override;
 
 private:
-    PlayerData m_playerData;
+    QSharedPointer<PlayerData> m_playerData;
 };
 
-TO_TYPE_ID(LoggedInEvent, Event::LoggedIn);
+DECLARE_EVENT(LoggedInEvent, Event::LoggedIn);
 
 class LogInFailedEvent : public Event
 {
+    Q_OBJECT
+    QML_ELEMENT
+    Q_PROPERTY(QString username READ username WRITE setUsername)
+    Q_PROPERTY(QString reason READ reason WRITE setReason);
+
 public:
     LogInFailedEvent();
     LogInFailedEvent(const QString& username, const QString& reason);
@@ -54,12 +67,9 @@ public:
     void setReason(const QString& reason) { m_reason = reason; }
     const QString& reason() const { return m_reason; }
 
-    Result parse(const QJsonObject& eventJs) override;
-    QJsonObject toJson() const override;
-
 private:
     QString m_username;
     QString m_reason;
 };
 
-TO_TYPE_ID(LogInFailedEvent, Event::LogInFailed);
+DECLARE_EVENT(LogInFailedEvent, Event::LogInFailed);

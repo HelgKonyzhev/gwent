@@ -1,13 +1,12 @@
 #include "player_store.h"
+#include <QJsonArray>
 #include <QJsonObject>
+#include <QJsonValue>
 #include <mutex>
 
 constexpr char UsersFile[] = "users.json";
 
-PlayerStore::PlayerStore()
-    : m_usersFile{UsersFile}
-{
-}
+PlayerStore::PlayerStore() {}
 
 PlayerStore::~PlayerStore() {}
 
@@ -15,68 +14,75 @@ bool PlayerStore::load()
 {
     std::unique_lock lck{m_mtx};
 
-    if (!m_usersFile.open(QIODeviceBase::Text | QIODeviceBase::ReadWrite))
+    QFile usersFile{UsersFile};
+    if (!usersFile.open(QIODeviceBase::Text | QIODeviceBase::ReadWrite))
         return false;
 
-    const auto rawJson = m_usersFile.readAll();
+    const auto rawJson = usersFile.readAll();
     if (rawJson.isEmpty())
     {
         QJsonDocument json{QJsonObject{}};
-        m_usersFile.write(json.toJson(QJsonDocument::Compact));
-        m_usersFile.close();
+        usersFile.write(json.toJson(QJsonDocument::Compact));
+        usersFile.close();
         return true;
     }
 
     QJsonParseError error;
-    m_usersJson = QJsonDocument::fromJson(rawJson, &error);
+    const auto playersJs = QJsonDocument::fromJson(rawJson, &error).array();
 
-    m_usersFile.close();
+    usersFile.close();
 
     if (error.error != QJsonParseError::NoError)
         return false;
 
-    if (!m_usersJson.isObject())
+    for (const auto& playerJs : playersJs)
     {
-        m_usersJson = {};
-        return false;
+        auto playerData = QSharedPointer<PlayerData>{new PlayerData};
+        playerData->fromJson(playerJs.toObject());
+        m_players.insert(playerData->name(), playerData);
     }
 
     return true;
 }
 
-Result PlayerStore::add(const PlayerData& user)
+Result PlayerStore::add(const QString& playerName, const QString& password)
 {
     std::unique_lock lck{m_mtx};
 
-    auto usersObj = m_usersJson.object();
-    if (usersObj.contains(user.name()))
-        return ResultError{"\'", user.name(), "\'", " aleady registered"};
+    if (m_players.contains(playerName))
+        return ResultError{"\'", playerName, "\'", " aleady registered"};
 
-    if (!m_usersFile.open(QIODeviceBase::Text | QIODeviceBase::ReadWrite))
-        return ResultError{"save failed"};
+    auto playerData = QSharedPointer<PlayerData>{new PlayerData(playerName, password)};
+    m_players.insert(playerName, playerData);
 
-    QJsonObject userObj;
-    userObj.insert("password", user.password());
-    usersObj.insert(user.name(), userObj);
-    m_usersJson.setObject(usersObj);
-    m_usersFile.write(m_usersJson.toJson(QJsonDocument::Indented));
-    m_usersFile.close();
-    return {};
+    return save();
 }
 
-ResultValue<PlayerData> PlayerStore::get(const QString& username, const QString& password)
+ResultValue<QSharedPointer<PlayerData> > PlayerStore::get(const QString& username, const QString& password)
 {
     std::shared_lock lck{m_mtx};
 
-    const auto usersObj = m_usersJson.object();
-    const auto it = usersObj.find(username);
-    if (it == usersObj.end())
+    auto it = m_players.find(username);
+    if (it == m_players.end())
         return ResultError{"\'", username, "\'", " doesn't exist"};
 
-    const auto storedPassword = it.value().toObject()["password"].toString();
-    if (password != storedPassword)
+    if (it.value()->password() != password)
         return ResultError{QString{"wrong password"}};
-    
-    auto user = PlayerData{username, password};
-    return user;
+
+    return it.value();
+}
+
+Result PlayerStore::save()
+{
+    QFile usersFile{UsersFile};
+    if (!usersFile.open(QIODeviceBase::Text | QIODeviceBase::ReadWrite))
+        return ResultError{"save failed"};
+
+    QJsonArray playersJs;
+    for (const auto& playerData : m_players)
+        playersJs.append(playerData->toJson());
+
+    usersFile.write(QJsonDocument{playersJs}.toJson(QJsonDocument::Indented));
+    usersFile.close();
+    return {};
 }

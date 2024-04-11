@@ -1,9 +1,14 @@
 #pragma once
 #include "event.h"
 #include <QStringList>
+#include <QtQml/qqmlregistration.h>
 
 class LobbyUpdatedEvent : public Event
 {
+    Q_OBJECT
+    QML_ELEMENT
+    Q_PROPERTY(QStringList players READ players WRITE setPlayers)
+
 public:
     LobbyUpdatedEvent();
     LobbyUpdatedEvent(const QStringList& players);
@@ -11,21 +16,19 @@ public:
     void setPlayers(const QStringList& players) { m_players = players; }
     const QStringList& players() const { return m_players; }
 
-    Result parse(const QJsonObject& eventJs) override;
-    QJsonObject toJson() const override;
-
 private:
     QStringList m_players;
 };
 
-TO_TYPE_ID(LobbyUpdatedEvent, Event::LobbyUpdated);
+DECLARE_EVENT(LobbyUpdatedEvent, Event::LobbyUpdated);
 
 class UpdateLobbyEvent : public Event
 {
+    Q_OBJECT
+    QML_ELEMENT
+
 public:
     UpdateLobbyEvent();
-
-    Result parse(const QJsonObject& eventJs) override;
 };
 
-TO_TYPE_ID(UpdateLobbyEvent, Event::UpdateLobby);
+DECLARE_EVENT(UpdateLobbyEvent, Event::UpdateLobby);

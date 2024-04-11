@@ -11,8 +11,8 @@ public:
     using QState::QState;
 
 signals:
-    void entered(Event *);
-    void exited(Event *);
+    Q_INVOKABLE void entered(QEvent *);
+    Q_INVOKABLE void exited(QEvent *);
 
 private:
     void onEntry(QEvent *event) override;

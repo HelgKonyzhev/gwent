@@ -1,8 +1,14 @@
 #pragma once
 #include "event.h"
+#include <QtQml/qqmlregistration.h>
 
 class RegisterEvent : public Event
 {
+    Q_OBJECT
+    QML_ELEMENT
+    Q_PROPERTY(QString username READ username WRITE setUsername)
+    Q_PROPERTY(QString password READ password WRITE setPassword);
+
 public:
     RegisterEvent();
     RegisterEvent(const QString& username, const QString& password);
@@ -13,18 +19,19 @@ public:
     void setPassword(const QString& password) { m_password = password; }
     const QString& password() const { return m_password; }
 
-    Result parse(const QJsonObject& eventJs);
-    QJsonObject toJson() const;
-
 private:
     QString m_username;
     QString m_password;
 };
 
-TO_TYPE_ID(RegisterEvent, Event::Register);
+DECLARE_EVENT(RegisterEvent, Event::Register);
 
 class RegisteredEvent : public Event
 {
+    Q_OBJECT
+    QML_ELEMENT
+    Q_PROPERTY(QString username READ username WRITE setUsername)
+
 public:
     RegisteredEvent();
     RegisteredEvent(const QString& username);
@@ -32,17 +39,19 @@ public:
     void setUsername(const QString& username) { m_username = username; }
     const QString& username() const { return m_username; }
 
-    Result parse(const QJsonObject& eventJs) override;
-    QJsonObject toJson() const override;
-
 private:
     QString m_username;
 };
 
-TO_TYPE_ID(RegisteredEvent, Event::Registered);
+DECLARE_EVENT(RegisteredEvent, Event::Registered);
 
 class RegistrationFailedEvent : public Event
 {
+    Q_OBJECT
+    QML_ELEMENT
+    Q_PROPERTY(QString username READ username WRITE setUsername)
+    Q_PROPERTY(QString reason READ reason WRITE setReason);
+
 public:
     RegistrationFailedEvent();
     RegistrationFailedEvent(const QString& username, const QString& reason);
@@ -53,12 +62,9 @@ public:
     void setReason(const QString& reason) { m_reason = reason; }
     const QString& reason() const { return m_reason; }
 
-    Result parse(const QJsonObject& eventJs) override;
-    QJsonObject toJson() const override;
-
 private:
     QString m_username;
     QString m_reason;
 };
 
-TO_TYPE_ID(RegistrationFailedEvent, Event::RegistrationFailed);
+DECLARE_EVENT(RegistrationFailedEvent, Event::RegistrationFailed);

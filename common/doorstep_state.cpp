@@ -9,6 +9,8 @@ DoorstepState::DoorstepState(Socket *socket, QState *parent)
     : State{parent}
     , m_socket{socket}
 {
+    qRegisterMetaType<DoorstepState>();
+
     setObjectName("thresholdState");
 
     auto initialState = new State{this};
@@ -20,8 +22,12 @@ DoorstepState::DoorstepState(Socket *socket, QState *parent)
     setInitialState(initialState);
 
     connect(initialState, &State::entered, this,
-            [this](Event *event)
+            [this](QEvent *qevent)
             {
+                auto event = castToEvent(qevent);
+                if (!event)
+                    return;
+
                 switch (static_cast<Event::Type>(event->type()))
                 {
                     case Event::Registered:
@@ -46,13 +52,13 @@ DoorstepState::DoorstepState(Socket *socket, QState *parent)
     registrationState->setObjectName("registrationState");
 
     connect(registrationState, &State::entered, this,
-            [this](Event *event) { emit registration(event->to<RegisterEvent>()); });
+            [this](QEvent *qevent) { emit registration(castToEvent(qevent)->to<RegisterEvent>()); });
 
     auto loggingInState = new State{this};
     loggingInState->setObjectName("loggingInState");
 
     connect(loggingInState, &State::entered, this,
-            [this](Event *event) { emit logging(event->to<LogInEvent>()); });
+            [this](QEvent *qevent) { emit logging(castToEvent(qevent)->to<LogInEvent>()); });
 
     addTransition(new EventTransition{m_socket, Event::Register, registrationState});
     addTransition(new EventTransition{m_socket, Event::LogIn, loggingInState});
