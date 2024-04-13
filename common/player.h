@@ -34,7 +34,7 @@ Q_DECLARE_OPAQUE_POINTER(LobbyState*);
 class Player : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QSharedPointer<PlayerData> data READ data CONSTANT)
+    Q_PROPERTY(const PlayerData* data READ dataPtr CONSTANT)
     Q_PROPERTY(DoorstepState* doorstepState READ doorstepState CONSTANT)
     Q_PROPERTY(LobbyState* lobbyState READ lobbyState CONSTANT)
 
@@ -45,7 +45,7 @@ public:
     void postEvent(Event* event);
 
     bool inLobby() const { return m_inLobby; }
-    const QSharedPointer<PlayerData> data() const { return m_data; }
+    QSharedPointer<PlayerData> data() const { return m_data; }
     const QStringList& playersInLobby() const { return m_playersInLobby; }
 
     DoorstepState* doorstepState() const { return m_doorstepState; }
@@ -59,9 +59,7 @@ signals:
     Q_INVOKABLE void registrationFailed(const RegistrationFailedEvent*);
 
 private:
-    void onDeckAdded(DeckAddedEvent* event);
-    void onDeckUpdated(DeckUpdatedEvent* event);
-    void onDeckErased(DeckErasedEvent* event);
+    const PlayerData* dataPtr() const { return m_data.data(); }
 
     QStateMachine* m_fsm;
     Socket* m_socket;

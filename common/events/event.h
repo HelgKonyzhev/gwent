@@ -52,14 +52,10 @@ public:
         RequestGame,
         GameAccepted,
         AddDeck,
-        DeckAdded,
-        DeckAddFailed,
         UpdateDeck,
-        DeckUpdated,
-        DeckUpdateFailed,
         EraseDeck,
-        DeckErased,
-        DeckEraseFailed,
+        DeckEdited,
+        DeckEditionFailed,
     };
     Q_ENUM(Type)
 

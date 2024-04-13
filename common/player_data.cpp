@@ -103,3 +103,5 @@ bool PlayerData::eraseDeck(const QString& name)
     m_decks.erase(it);
     return true;
 }
+
+Deck* PlayerData::getDeck(const QString& name) const { return m_decks.value(name, nullptr); }

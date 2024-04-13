@@ -20,9 +20,6 @@ Item {
         onLoaded: {
             item.save.connect(onSave)
             item.cancel.connect(onCancel)
-
-            //            console.log(item.width)
-            //            console.log(item.height)
         }
     }
 

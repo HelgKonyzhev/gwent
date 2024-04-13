@@ -29,6 +29,8 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<Event>("common.events", 1, 0, "Event", "Not creatable base event class");
 
     qmlRegisterType<PlayerData>("common", 1, 0, "PlayerData");
+    qmlRegisterType<PlayerData *>("common", 1, 0, "PlayerData");
+    qmlRegisterType<const PlayerData *>("common", 1, 0, "PlayerData");
     qmlRegisterType<QScopedPointer<PlayerData>>("common", 1, 0, "PlayerData");
 
     qmlRegisterType<DoorstepState>("common", 1, 0, "DoorstepState");

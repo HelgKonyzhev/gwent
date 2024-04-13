@@ -8,6 +8,8 @@ SOURCES += \
     $$PWD/doorstep_state.cpp \
     $$PWD/event_transition.cpp \
     $$PWD/events/add_deck_event.cpp \
+    $$PWD/events/deck_edited_event.cpp \
+    $$PWD/events/deck_edition_failed.cpp \
     $$PWD/events/event.cpp \
     $$PWD/events/erase_deck_event.cpp \
     $$PWD/events/lobby_updated_event.cpp \
@@ -33,6 +35,8 @@ HEADERS += \
     $$PWD/doorstep_state.h \
     $$PWD/event_transition.h \
     $$PWD/events/add_deck_event.h \
+    $$PWD/events/deck_edited_event.h \
+    $$PWD/events/deck_edition_failed.h \
     $$PWD/events/event.h \
     $$PWD/events/erase_deck_event.h \
     $$PWD/events/lobby_updated_event.h \

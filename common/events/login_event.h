@@ -33,13 +33,14 @@ class LoggedInEvent : public Event
 {
     Q_OBJECT
     QML_ELEMENT
+    Q_PROPERTY(QSharedPointer<PlayerData> playerData READ playerData WRITE setPlayerData)
 
 public:
     LoggedInEvent();
     LoggedInEvent(QSharedPointer<PlayerData> playerData);
 
     void setPlayerData(QSharedPointer<PlayerData> playerData) { m_playerData = playerData; }
-    Q_INVOKABLE QSharedPointer<PlayerData> playerData() const { return m_playerData; }
+    QSharedPointer<PlayerData> playerData() const { return m_playerData; }
 
     Result parse(const QVariantHash& eventData) override;
     QJsonObject toJson() const override;

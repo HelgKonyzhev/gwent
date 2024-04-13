@@ -18,6 +18,7 @@
 #include <common/events/add_deck_event.h>
 #include <common/events/update_deck_event.h>
 #include <common/events/erase_deck_event.h>
+#include <common/events/deck_edited_event.h>
 
 Player::Player(Socket *socket, QObject *parent)
     : QObject{parent}
@@ -57,9 +58,8 @@ Player::Player(Socket *socket, QObject *parent)
     connect(m_doorstepState, &DoorstepState::registered, this, &Player::registered);
     connect(m_doorstepState, &DoorstepState::registrationFailed, this, &Player::registrationFailed);
 
-    connect(m_lobbyState, &LobbyState::deckAdded, this, &Player::onDeckAdded);
-    connect(m_lobbyState, &LobbyState::deckUpdated, this, &Player::onDeckUpdated);
-    connect(m_lobbyState, &LobbyState::deckErased, this, &Player::onDeckErased);
+    connect(m_lobbyState, &LobbyState::deckEdited, this,
+            [this](DeckEditedEvent *event) { m_data = event->playerData(); });
 
     if (m_socket->state() == QAbstractSocket::ConnectedState)
         m_fsm->start();
@@ -69,24 +69,4 @@ void Player::postEvent(Event *event)
 {
     event->setSource(this);
     m_fsm->postEvent(event);
-}
-
-void Player::onDeckAdded(DeckAddedEvent *event)
-{
-    Deck deck{event->name(), event->fraction(), event->cards(), nullptr};
-    if (!m_data->addDeck(deck))
-        qWarning() << "failed to add deck" << event->name() << event->fraction();
-}
-
-void Player::onDeckUpdated(DeckUpdatedEvent *event)
-{
-    Deck deck{event->name(), event->fraction(), event->cards(), nullptr};
-    if (!m_data->updateDeck(deck))
-        qWarning() << "failed to update deck" << event->name() << event->fraction();
-}
-
-void Player::onDeckErased(DeckErasedEvent *event)
-{
-    if (!m_data->eraseDeck(event->name()))
-        qWarning() << "failed to erase deck" << event->name();
 }

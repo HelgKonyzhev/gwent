@@ -15,6 +15,8 @@
 #include <common/events/update_deck_event.h>
 #include <common/events/erase_deck_event.h>
 #include <common/deck.h>
+#include <common/events/deck_edited_event.h>
+#include <common/events/deck_edition_failed.h>
 
 Server::Server(QObject* parent)
     : QObject{parent}
@@ -162,9 +164,9 @@ void Server::onAddDeck(Player* player, AddDeckEvent* event)
     Deck deck{event->name(), event->fraction(), event->cards(), nullptr};
     const auto added = m_playersStore.addDeck(player->data()->name(), deck);
     if (added)
-        player->postEvent(new DeckAddedEvent{event});
+        player->postEvent(new DeckEditedEvent{deck.name(), player->data()});
     else
-        player->postEvent(new DeckAddFailedEvent{event->name(), added.error()});
+        player->postEvent(new DeckEditionFailedEvent{deck.name(), added.error()});
 }
 
 void Server::onUpdateDeck(Player* player, UpdateDeckEvent* event)
@@ -172,16 +174,16 @@ void Server::onUpdateDeck(Player* player, UpdateDeckEvent* event)
     Deck deck{event->name(), event->fraction(), event->cards(), nullptr};
     const auto updated = m_playersStore.updateDeck(player->data()->name(), deck);
     if (updated)
-        player->postEvent(new DeckUpdatedEvent{event});
+        player->postEvent(new DeckEditedEvent{deck.name(), player->data()});
     else
-        player->postEvent(new DeckUpdateFailedEvent{event->name(), updated.error()});
+        player->postEvent(new DeckEditionFailedEvent{deck.name(), updated.error()});
 }
 
 void Server::onEraseDeck(Player* player, EraseDeckEvent* event)
 {
     const auto erased = m_playersStore.eraseDeck(player->data()->name(), event->name());
     if (erased)
-        player->postEvent(new DeckErasedEvent{event->name()});
+        player->postEvent(new DeckEditedEvent{event->name(), player->data()});
     else
-        player->postEvent(new DeckEraseFailedEvent{event->name(), erased.error()});
+        player->postEvent(new DeckEditionFailedEvent{event->name(), erased.error()});
 }

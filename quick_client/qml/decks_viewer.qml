@@ -29,10 +29,20 @@ Item {
             model: decksListModel
 
             delegate: Component {
-                id: nameDelegate
-                Text {
-                    required property string name
+                ItemDelegate {
+                    width: decksListView.width - decksListView.leftMargin
+                           - decksListView.rightMargin
                     text: name
+                    palette.text: "black"
+                    highlighted: ListView.isCurrentItem
+
+                    onClicked: {
+                        decksListView.currentIndex = index
+                    }
+
+                    background: Rectangle {
+                        color: highlighted ? "black" : "white"
+                    }
                 }
             }
 
@@ -55,12 +65,19 @@ Item {
                 }
             }
 
-            TextInput {
-                id: deckNameInput
-                text: "New deck"
-            }
-
             spacing: 10
         }
+    }
+
+    function reload() {//        console.log(player.data.name)
+        //        var deckNames = player.data.deckNames
+        //        for (var i = 0; i < deckNames.length; ++i)
+        //            decksListModel.append({
+        //                                      "name": deckNames[i]
+        //                                  })
+    }
+
+    Component.onCompleted: {
+        reload()
     }
 }

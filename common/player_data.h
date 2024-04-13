@@ -9,9 +9,10 @@ class Deck;
 
 class PlayerData : public QObject
 {
+    Q_OBJECT
     Q_PROPERTY(QString name READ name CONSTANT);
     Q_PROPERTY(QString password READ password CONSTANT);
-    Q_PROPERTY(QHash<QString, Deck*> decks READ decks CONSTANT);
+    Q_PROPERTY(QStringList deckNames READ deckNames CONSTANT);
 
 public:
     PlayerData();
@@ -21,6 +22,7 @@ public:
     const QString& name() const { return m_name; }
     const QString& password() const { return m_password; }
     const QHash<QString, Deck*>& decks() const { return m_decks; }
+    QStringList deckNames() const { return m_decks.keys(); }
 
     Result fromJson(const QJsonObject& json);
     Result fromVariant(const QVariantHash& data);
@@ -30,6 +32,7 @@ public:
     bool addDeck(const Deck& deck);
     bool updateDeck(const Deck& deck);
     bool eraseDeck(const QString& name);
+    Q_INVOKABLE Deck* getDeck(const QString& name) const;
 
 private:
     QString m_name;
