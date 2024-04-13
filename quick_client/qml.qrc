@@ -3,5 +3,7 @@
         <file>qml/main.qml</file>
         <file>qml/doorstep.qml</file>
         <file>qml/lobby.qml</file>
+        <file>qml/deck_editor.qml</file>
+        <file>qml/decks_viewer.qml</file>
     </qresource>
 </RCC>

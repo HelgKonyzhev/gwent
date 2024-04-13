@@ -10,6 +10,9 @@ class UpdateLobbyEvent;
 class LoggedInEvent;
 class StartGameEvent;
 class GameAcceptedEvent;
+class AddDeckEvent;
+class UpdateDeckEvent;
+class EraseDeckEvent;
 
 class Server : public QObject
 {
@@ -30,10 +33,13 @@ private:
     void onDisconnected(Player* player);
     void onStartGame(Player* player, StartGameEvent* event);
     void onGameAccepted(Player* player, GameAcceptedEvent* event);
+    void onAddDeck(Player* player, AddDeckEvent* event);
+    void onUpdateDeck(Player* player, UpdateDeckEvent* event);
+    void onEraseDeck(Player* player, EraseDeckEvent* event);
 
     QWebSocketServer* m_wsServer;
     QSet<Player*> m_players;
-    PlayerStore m_users;
+    PlayerStore m_playersStore;
     QMap<QString, Player*> m_loggedPlayers;
     QMap<QString, Player*> m_waitingPlayers;
 };

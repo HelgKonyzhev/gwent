@@ -51,6 +51,15 @@ public:
         GameStartFailed,
         RequestGame,
         GameAccepted,
+        AddDeck,
+        DeckAdded,
+        DeckAddFailed,
+        UpdateDeck,
+        DeckUpdated,
+        DeckUpdateFailed,
+        EraseDeck,
+        DeckErased,
+        DeckEraseFailed,
     };
     Q_ENUM(Type)
 
@@ -106,8 +115,9 @@ private:
         return static_cast<size_t>(tid) - static_cast<size_t>(QEvent::Type::User);
     }
 
+    static std::vector<EventCreator>& eventCreators();
+
     QObject* m_source;
-    static std::vector<EventCreator> m_eventCreators;
 };
 
 Q_DECLARE_METATYPE(Event);

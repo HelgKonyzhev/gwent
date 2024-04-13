@@ -3,7 +3,7 @@
 #include <QWebSocket>
 #include <QQmlContext>
 #include <common/socket.h>
-#include <common/player.h>
+#include "quick_player.h"
 #include <common/player_data.h>
 #include <common/cards_data/card_data.h>
 #include <common/cards_data/cards_data.h>
@@ -11,6 +11,7 @@
 #include <common/events/event.h>
 #include <common/doorstep_state.h>
 #include <common/lobby_state.h>
+#include <common/deck.h>
 
 int main(int argc, char *argv[])
 {
@@ -23,10 +24,7 @@ int main(int argc, char *argv[])
         Qt::QueuedConnection);
 
     auto socket = new Socket{new QWebSocket{"", QWebSocketProtocol::VersionLatest}, &app};
-    auto player = new Player{socket, &app};
-
-    engine.rootContext()->setContextProperty("socket", socket);
-    engine.rootContext()->setContextProperty("player", player);
+    auto player = new QuickPlayer{socket, &app};
 
     qmlRegisterUncreatableType<Event>("common.events", 1, 0, "Event", "Not creatable base event class");
 
@@ -43,13 +41,20 @@ int main(int argc, char *argv[])
     qmlRegisterType<CardData *>("common.card_data", 1, 0, "CardData");
     qmlRegisterType<const CardData *>("common.card_data", 1, 0, "CardData");
 
-    qmlRegisterType<CardsData>("common.cards_data", 1, 0, "CardsData");
     qmlRegisterType<CardsData *>("common.cards_data", 1, 0, "CardsData");
     qmlRegisterType<const CardsData *>("common.cards_data", 1, 0, "CardsData");
 
     qmlRegisterType<CardsSet>("common.cards_set", 1, 0, "CardsSet");
     qmlRegisterType<CardsSet *>("common.cards_set", 1, 0, "CardsSet");
     qmlRegisterType<const CardsSet *>("common.cards_set", 1, 0, "CardsSet");
+
+    qmlRegisterType<Deck>("common", 1, 0, "Deck");
+    qmlRegisterType<Deck *>("common", 1, 0, "Deck");
+    qmlRegisterType<const Deck *>("common", 1, 0, "Deck");
+
+    engine.rootContext()->setContextProperty("socket", socket);
+    engine.rootContext()->setContextProperty("player", player);
+    engine.rootContext()->setContextProperty("cardsData", CardsData::instance());
 
     engine.load(url);
 

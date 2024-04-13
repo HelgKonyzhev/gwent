@@ -23,6 +23,10 @@ class GameAcceptedEvent;
 class GameDeclinedEvent;
 class DoorstepState;
 class LobbyState;
+class Deck;
+class DeckAddedEvent;
+class DeckUpdatedEvent;
+class DeckErasedEvent;
 
 Q_DECLARE_OPAQUE_POINTER(DoorstepState*);
 Q_DECLARE_OPAQUE_POINTER(LobbyState*);
@@ -46,9 +50,7 @@ public:
 
     DoorstepState* doorstepState() const { return m_doorstepState; }
     LobbyState* lobbyState() const { return m_lobbyState; }
-
-    Q_INVOKABLE void login(const QString& username, const QString& password);
-    Q_INVOKABLE void registerPlayer(const QString& username, const QString& password);
+    QStateMachine* fsm() const { return m_fsm; }
 
 signals:
     Q_INVOKABLE void loggedIn(const LoggedInEvent*);
@@ -57,6 +59,10 @@ signals:
     Q_INVOKABLE void registrationFailed(const RegistrationFailedEvent*);
 
 private:
+    void onDeckAdded(DeckAddedEvent* event);
+    void onDeckUpdated(DeckUpdatedEvent* event);
+    void onDeckErased(DeckErasedEvent* event);
+
     QStateMachine* m_fsm;
     Socket* m_socket;
     bool m_inLobby = false;

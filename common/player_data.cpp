@@ -70,3 +70,36 @@ QVariantHash PlayerData::toVariant() const
     data.insert("decks", decks);
     return data;
 }
+
+bool PlayerData::addDeck(const Deck& deck)
+{
+    if (m_decks.contains(deck.name()))
+        return false;
+
+    auto newDeck = new Deck{this};
+    newDeck->copy(&deck);
+
+    m_decks.insert(newDeck->name(), newDeck);
+    return true;
+}
+
+bool PlayerData::updateDeck(const Deck& deck)
+{
+    auto it = m_decks.find(deck.name());
+    if (it == m_decks.end())
+        return false;
+
+    it.value()->copy(&deck);
+    return true;
+}
+
+bool PlayerData::eraseDeck(const QString& name)
+{
+    auto it = m_decks.find(name);
+    if (it == m_decks.end())
+        return false;
+
+    delete it.value();
+    m_decks.erase(it);
+    return true;
+}

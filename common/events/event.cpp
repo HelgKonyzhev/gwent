@@ -3,16 +3,20 @@
 #include <QJsonDocument>
 #include <QMetaProperty>
 
-std::vector<Event::EventCreator> Event::m_eventCreators;
+std::vector<Event::EventCreator>& Event::eventCreators()
+{
+    static std::vector<Event::EventCreator> creators;
+    return creators;
+}
 
 void Event::registerEvent(Type tid, EventCreator creator)
 {
-    auto& eventCreators = m_eventCreators;
+    auto& ec = eventCreators();
 
     const auto tn = typeNum(tid);
-    if (tn >= eventCreators.size())
-        eventCreators.resize(tn + 1);
-    eventCreators[tn] = creator;
+    if (tn >= ec.size())
+        ec.resize(tn + 1);
+    ec[tn] = creator;
 }
 
 Event::Event(Type t)
@@ -23,12 +27,12 @@ Event::Event(Type t)
 
 Event* Event::make(Type t)
 {
-    auto& eventCreators = m_eventCreators;
+    auto& ec = eventCreators();
 
     const auto tn = typeNum(t);
-    if (tn > eventCreators.size())
+    if (tn > ec.size())
         return nullptr;
-    return eventCreators[tn]();
+    return ec[tn]();
 }
 
 ResultValue Event::fromJson(const QJsonObject& eventJs)

@@ -3,6 +3,7 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <mutex>
+#include <common/deck.h>
 
 constexpr char UsersFile[] = "users.json";
 
@@ -69,7 +70,7 @@ ResultValue PlayerStore::get(const QString& username, const QString& password)
     if (it.value()->password() != password)
         return ResultError{QString{"wrong password"}};
 
-    return it.value();
+    return QSharedPointer<PlayerData>{it.value()};
 }
 
 Result PlayerStore::save()
@@ -85,4 +86,49 @@ Result PlayerStore::save()
     usersFile.write(QJsonDocument{playersJs}.toJson(QJsonDocument::Indented));
     usersFile.close();
     return {};
+}
+
+Result PlayerStore::addDeck(const QString& playerName, const Deck& deck)
+{
+    std::shared_lock lck{m_mtx};
+
+    auto playerIt = m_players.find(playerName);
+    if (playerIt == m_players.end())
+        return ResultError{QString{"no player \'%1\' registered"}.arg(playerName)};
+
+    if (playerIt.value().data()->decks().contains(deck.name()))
+        return ResultError{QString{"player \'%1\' already has deck \'%2\'"}.arg(playerName).arg(deck.name())};
+
+    playerIt->data()->addDeck(deck);
+    return save();
+}
+
+Result PlayerStore::updateDeck(const QString& playerName, Deck& deck)
+{
+    std::shared_lock lck{m_mtx};
+
+    auto playerIt = m_players.find(playerName);
+    if (playerIt == m_players.end())
+        return ResultError{QString{"no player \'%1\' registered"}.arg(playerName)};
+
+    if (!playerIt.value().data()->decks().contains(deck.name()))
+        return ResultError{QString{"player \'%1\' has no deck \'%2\'"}.arg(playerName).arg(deck.name())};
+
+    playerIt->data()->updateDeck(deck);
+    return save();
+}
+
+Result PlayerStore::eraseDeck(const QString& playerName, const QString& deckName)
+{
+    std::shared_lock lck{m_mtx};
+
+    auto playerIt = m_players.find(playerName);
+    if (playerIt == m_players.end())
+        return ResultError{QString{"no player \'%1\' registered"}.arg(playerName)};
+
+    if (!playerIt.value().data()->decks().contains(deckName))
+        return ResultError{QString{"player \'%1\' has no deck \'%2\'"}.arg(playerName).arg(deckName)};
+
+    playerIt.value().data()->eraseDeck(deckName);
+    return save();
 }

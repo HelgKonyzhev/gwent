@@ -2,65 +2,57 @@ import QtQuick
 import QtQuick.Controls
 
 Item {
-    Item {
-        anchors.left: parent.left
-        height: parent.height
-        width: parent.width / 3
+    Loader {
+        id: decksViewerLoader
+        source: "qrc:/qml/decks_viewer.qml"
+        anchors.fill: parent
 
-        Label {
-            id: decksLabel
-            anchors.top: parent.top
-            color: "black"
-            text: "Decks:"
+        onLoaded: {
+            item.addDeck.connect(onAddDeck)
         }
+    }
 
-        ListModel {
-            id: decksListModel
+    Loader {
+        id: deckEditorLoader
+        visible: false
+        anchors.fill: parent
+
+        onLoaded: {
+            item.save.connect(onSave)
+            item.cancel.connect(onCancel)
+
+            //            console.log(item.width)
+            //            console.log(item.height)
         }
+    }
 
-        ListView {
-            id: decksListView
-            anchors.top: decksLabel.bottom
-            anchors.bottom: addDeckRow.top
-            width: parent.width
+    function onAddDeck() {
+        player.addDeck()
 
-            model: decksListModel
+        decksViewerLoader.visible = false
+        deckEditorLoader.visible = true
 
-            delegate: Component {
-                id: nameDelegate
-                Text {
-                    required property string name
-                    text: name
-                }
-            }
+        decksViewerLoader.source = ""
+        deckEditorLoader.source = "qrc:/qml/deck_editor.qml"
+    }
 
-            leftMargin: 5
-            rightMargin: 5
-            topMargin: 5
-            bottomMargin: 5
-        }
+    function onSave() {
+        decksViewerLoader.visible = true
+        deckEditorLoader.visible = false
 
-        Row {
-            id: addDeckRow
-            anchors.bottom: parent.bottom
+        decksViewerLoader.source = "qrc:/qml/decks_viewer.qml"
+        deckEditorLoader.source = ""
 
-            Button {
-                id: addDeckButton
-                text: "Add deck"
+        player.saveDeck()
+    }
 
-                onClicked: {
-                    decksListModel.append({
-                                              "name": deckNameInput.text
-                                          })
-                }
-            }
+    function onCancel() {
+        decksViewerLoader.visible = true
+        deckEditorLoader.visible = false
 
-            TextInput {
-                id: deckNameInput
-                text: "New deck"
-            }
+        decksViewerLoader.source = "qrc:/qml/decks_viewer.qml"
+        deckEditorLoader.source = ""
 
-            spacing: 10
-        }
+        player.cancelEdition()
     }
 }

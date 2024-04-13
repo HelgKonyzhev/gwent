@@ -6,7 +6,6 @@ class CardsData;
 class CardData : public QObject
 {
     Q_OBJECT
-
     Q_PROPERTY(QString name READ name CONSTANT);
     Q_PROPERTY(QString image READ image CONSTANT);
     Q_PROPERTY(QString fraction READ fraction CONSTANT);

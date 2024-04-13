@@ -12,6 +12,7 @@ LobbyUpdatedEvent::LobbyUpdatedEvent(const QStringList& players)
     : Event{LobbyUpdated}
     , m_players{players}
 {
+    qRegisterMetaType<LobbyUpdatedEvent>();
 }
 
 REGISTER_EVENT(LobbyUpdatedEvent)

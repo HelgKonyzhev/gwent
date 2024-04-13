@@ -6,6 +6,16 @@
 Deck::Deck(QObject* parent)
     : QObject{parent}
 {
+    qRegisterMetaType<Deck>();
+}
+
+Deck::Deck(const QString& name, const QString fraction, const QStringList& cards, QObject* parent)
+    : QObject{parent}
+    , m_name{name}
+    , m_fraction{fraction}
+    , m_cards{cards}
+{
+    qRegisterMetaType<Deck>();
 }
 
 Result Deck::fromJson(const QJsonObject& deckJs) { return fromVariant(deckJs.toVariantHash()); }
@@ -43,17 +53,15 @@ QJsonObject Deck::toJson() const { return QJsonObject::fromVariantHash(toVariant
 
 QVariantHash Deck::toVariant() const
 {
-    if (!valid())
-        return {};
-
     QVariantHash deckData;
     deckData["name"] = name();
     deckData["fraction"] = fraction();
 
     QStringList cards;
-    for (const auto& card : m_cards.getAll())
+    for (const auto& card : m_cards.all())
         cards.append(card->name());
 
+    deckData["cards"] = cards;
     return deckData;
 }
 
@@ -88,9 +96,9 @@ bool Deck::setLeader(const CardData* leader)
 
     auto oldLeader = this->leader();
     if (oldLeader)
-        m_cards.erase(oldLeader);
+        eraseCard(oldLeader);
 
-    return m_cards.add(leader);
+    return doAddCard(leader);
 }
 
 const CardData* Deck::leader() const
@@ -102,21 +110,37 @@ const CardData* Deck::leader() const
     return *res.begin();
 }
 
-QPair<bool, bool> Deck::addCard(const QString& cardName)
+bool Deck::addCard(const QString& cardName)
 {
     auto card = CardsData::instance()->cards().get(cardName);
     if (!card)
-        return {false, false};
+        return false;
 
     return addCard(card);
 }
 
-QPair<bool, bool> Deck::addCard(const CardData* card)
+bool Deck::addCard(const CardData* card)
 {
-    if (!specialsLimit())
-        return {false, false};
+    if (card->tags().contains("leader"))
+        return setLeader(card);
+    return doAddCard(card);
+}
 
-    return {m_cards.add(card), true};
+bool Deck::eraseCard(const QString& cardName)
+{
+    auto card = CardsData::instance()->cards().get(cardName);
+    if (!card)
+        return false;
+
+    return eraseCard(card);
+}
+
+bool Deck::eraseCard(const CardData* card)
+{
+    const auto erased = m_cards.erase(card);
+    if (erased)
+        emit cardErased(card);
+    return erased;
 }
 
 Limit Deck::squadsLimit() const
@@ -134,4 +158,19 @@ Limit Deck::specialsLimit() const
 bool Deck::valid() const
 {
     return !name().isEmpty() && !fraction().isEmpty() && hasLeader() && squadsLimit() && specialsLimit();
+}
+
+void Deck::copy(const Deck* other)
+{
+    m_name = other->name();
+    m_fraction = other->fraction();
+    m_cards = other->cards();
+}
+
+bool Deck::doAddCard(const CardData* card)
+{
+    const auto added = m_cards.add(card);
+    if (added)
+        emit cardAdded(card);
+    return added;
 }

@@ -14,6 +14,13 @@ size_t qHash(const QVariant& v)
 
 CardsSet::CardsSet() { qRegisterMetaType<CardsSet>(); }
 
+CardsSet::CardsSet(const QStringList& cards)
+{
+    qRegisterMetaType<CardsSet>();
+    for (const auto& card : cards)
+        add(card);
+}
+
 bool CardsSet::add(const CardData* card)
 {
     if (get(card->name()))
@@ -44,7 +51,8 @@ bool CardsSet::add(const CardData* card)
                 filter[strVal].insert(card);
         }
     }
-    m_all.insert(card);
+    m_all.append(card);
+    m_allNames.append(card->name());
     return true;
 }
 
@@ -112,8 +120,8 @@ bool CardsSet::erase(const QString& cardName)
     if (!card)
         return false;
 
-    auto cardIt = m_all.find(card);
-    if (cardIt == m_all.end())
+    auto cardIdx = m_all.indexOf(card);
+    if (cardIdx == -1)
         return false;
 
     for (auto filterIt = m_cards.begin(); filterIt != m_cards.end();)
@@ -136,7 +144,7 @@ bool CardsSet::erase(const QString& cardName)
             ++filterIt;
     }
 
-    m_all.erase(cardIt);
+    m_all.remove(cardIdx);
     return true;
 }
 

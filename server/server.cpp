@@ -11,6 +11,10 @@
 #include <common/events/request_game_event.h>
 #include <common/doorstep_state.h>
 #include <common/lobby_state.h>
+#include <common/events/add_deck_event.h>
+#include <common/events/update_deck_event.h>
+#include <common/events/erase_deck_event.h>
+#include <common/deck.h>
 
 Server::Server(QObject* parent)
     : QObject{parent}
@@ -24,7 +28,7 @@ Server::~Server() {}
 
 bool Server::serve()
 {
-    if (!m_users.load())
+    if (!m_playersStore.load())
         return false;
 
     return m_wsServer->listen(QHostAddress::Any, 8888);
@@ -48,6 +52,12 @@ void Server::onNewConnection()
             [this, player](StartGameEvent* event) { onStartGame(player, event); });
     connect(player->lobbyState(), &LobbyState::gameAccepted, this,
             [this, player](GameAcceptedEvent* event) { onGameAccepted(player, event); });
+    connect(player->lobbyState(), &LobbyState::addingDeck, this,
+            [this, player](AddDeckEvent* event) { onAddDeck(player, event); });
+    connect(player->lobbyState(), &LobbyState::updatingDeck, this,
+            [this, player](UpdateDeckEvent* event) { onUpdateDeck(player, event); });
+    connect(player->lobbyState(), &LobbyState::erasingDeck, this,
+            [this, player](EraseDeckEvent* event) { onEraseDeck(player, event); });
 
     qDebug() << __func__ << player->socket()->requestUrl();
 
@@ -63,7 +73,7 @@ void Server::onLoggingIn(Player* player, LogInEvent* event)
         return;
     }
 
-    const auto playerData = m_users.get(event->username(), event->password());
+    const auto playerData = m_playersStore.get(event->username(), event->password());
     if (!playerData)
         player->postEvent(new LogInFailedEvent{event->username(), playerData.error()});
     else
@@ -72,7 +82,7 @@ void Server::onLoggingIn(Player* player, LogInEvent* event)
 
 void Server::onRegistration(Player* player, RegisterEvent* event)
 {
-    if (const auto res = m_users.add(event->username(), event->password()); !res)
+    if (const auto res = m_playersStore.add(event->username(), event->password()); !res)
         player->postEvent(new RegistrationFailedEvent{event->username(), res.error()});
     else
         player->postEvent(new RegisteredEvent{event->username()});
@@ -145,4 +155,33 @@ void Server::onGameAccepted(Player* player, GameAcceptedEvent* event)
 
     player->postEvent(new GameStartedEvent{opponent->data()->name()});
     opponent->postEvent(new GameStartedEvent{player->data()->name()});
+}
+
+void Server::onAddDeck(Player* player, AddDeckEvent* event)
+{
+    Deck deck{event->name(), event->fraction(), event->cards(), nullptr};
+    const auto added = m_playersStore.addDeck(player->data()->name(), deck);
+    if (added)
+        player->postEvent(new DeckAddedEvent{event});
+    else
+        player->postEvent(new DeckAddFailedEvent{event->name(), added.error()});
+}
+
+void Server::onUpdateDeck(Player* player, UpdateDeckEvent* event)
+{
+    Deck deck{event->name(), event->fraction(), event->cards(), nullptr};
+    const auto updated = m_playersStore.updateDeck(player->data()->name(), deck);
+    if (updated)
+        player->postEvent(new DeckUpdatedEvent{event});
+    else
+        player->postEvent(new DeckUpdateFailedEvent{event->name(), updated.error()});
+}
+
+void Server::onEraseDeck(Player* player, EraseDeckEvent* event)
+{
+    const auto erased = m_playersStore.eraseDeck(player->data()->name(), event->name());
+    if (erased)
+        player->postEvent(new DeckErasedEvent{event->name()});
+    else
+        player->postEvent(new DeckEraseFailedEvent{event->name(), erased.error()});
 }
