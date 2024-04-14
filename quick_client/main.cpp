@@ -9,8 +9,8 @@
 #include <common/cards_data/cards_data.h>
 #include <common/cards_data/cards_set.h>
 #include <common/events/event.h>
-#include <common/doorstep_state.h>
-#include <common/lobby_state.h>
+#include <common/states/doorstep_state.h>
+#include <common/states/lobby_state.h>
 #include <common/deck.h>
 
 int main(int argc, char *argv[])
@@ -33,11 +33,11 @@ int main(int argc, char *argv[])
     qmlRegisterType<const PlayerData *>("common", 1, 0, "PlayerData");
     qmlRegisterType<QScopedPointer<PlayerData>>("common", 1, 0, "PlayerData");
 
-    qmlRegisterType<DoorstepState>("common", 1, 0, "DoorstepState");
-    qmlRegisterType<DoorstepState *>("common", 1, 0, "DoorstepState");
+    qmlRegisterType<DoorstepState>("common.states", 1, 0, "DoorstepState");
+    qmlRegisterType<DoorstepState *>("common.states", 1, 0, "DoorstepState");
 
-    qmlRegisterType<LobbyState>("common", 1, 0, "DoorstepState");
-    qmlRegisterType<LobbyState *>("common", 1, 0, "DoorstepState");
+    qmlRegisterType<LobbyState>("common.states", 1, 0, "LobbyState");
+    qmlRegisterType<LobbyState *>("common.states", 1, 0, "LobbyState");
 
     qmlRegisterType<CardData>("common.card_data", 1, 0, "CardData");
     qmlRegisterType<CardData *>("common.card_data", 1, 0, "CardData");

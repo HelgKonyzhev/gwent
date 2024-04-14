@@ -1,7 +1,6 @@
 #include "state.h"
 #include <common/events/event.h>
 #include <QDebug>
-#include <common/socket.h>
 
 void State::onEntry(QEvent *event)
 {

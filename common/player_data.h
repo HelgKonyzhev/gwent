@@ -21,7 +21,7 @@ public:
 
     const QString& name() const { return m_name; }
     const QString& password() const { return m_password; }
-    const QHash<QString, Deck*>& decks() const { return m_decks; }
+    const QMap<QString, Deck*>& decks() const { return m_decks; }
     QStringList deckNames() const { return m_decks.keys(); }
 
     Result fromJson(const QJsonObject& json);
@@ -37,7 +37,7 @@ public:
 private:
     QString m_name;
     QString m_password;
-    QHash<QString, Deck*> m_decks;
+    QMap<QString, Deck*> m_decks;
 };
 
 Q_DECLARE_METATYPE(PlayerData);

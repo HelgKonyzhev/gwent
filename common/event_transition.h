@@ -13,6 +13,8 @@ public:
     EventTransition(Socket *socket, Event::Type eventType);
     EventTransition(Socket *socket, Event::Type eventType, QAbstractState *targetState);
 
+    auto eventType() const { return m_eventType; }
+
 signals:
     void triggered(Event *event);
 

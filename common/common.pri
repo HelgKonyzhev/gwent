@@ -5,7 +5,8 @@ SOURCES += \
     $$PWD/cards_data/cards_data.cpp \
     $$PWD/cards_data/cards_set.cpp \
     $$PWD/deck.cpp \
-    $$PWD/doorstep_state.cpp \
+    $$PWD/state_machine.cpp \
+    $$PWD/states/doorstep_state.cpp \
     $$PWD/event_transition.cpp \
     $$PWD/events/add_deck_event.cpp \
     $$PWD/events/deck_edited_event.cpp \
@@ -19,20 +20,20 @@ SOURCES += \
     $$PWD/events/request_game_event.cpp \
     $$PWD/events/start_game_event.cpp \
     $$PWD/events/update_deck_event.cpp \
-    $$PWD/final_state.cpp \
-    $$PWD/lobby_state.cpp \
+    $$PWD/states/lobby_state.cpp \
     $$PWD/player.cpp \
     $$PWD/player_data.cpp \
     $$PWD/result.cpp \
     $$PWD/socket.cpp \
-    $$PWD/state.cpp
+    $$PWD/states/state.cpp
 
 HEADERS += \
     $$PWD/cards_data/card_data.h \
     $$PWD/cards_data/cards_data.h \
     $$PWD/cards_data/cards_set.h \
     $$PWD/deck.h \
-    $$PWD/doorstep_state.h \
+    $$PWD/state_machine.h \
+    $$PWD/states/doorstep_state.h \
     $$PWD/event_transition.h \
     $$PWD/events/add_deck_event.h \
     $$PWD/events/deck_edited_event.h \
@@ -46,12 +47,11 @@ HEADERS += \
     $$PWD/events/request_game_event.h \
     $$PWD/events/start_game_event.h \
     $$PWD/events/update_deck_event.h \
-    $$PWD/final_state.h \
-    $$PWD/lobby_state.h \
+    $$PWD/states/lobby_state.h \
     $$PWD/player.h \
     $$PWD/player_data.h \
     $$PWD/socket.h \
-    $$PWD/state.h \
+    $$PWD/states/state.h \
     $$PWD/result.h
 
 INCLUDEPATH += $$PWD

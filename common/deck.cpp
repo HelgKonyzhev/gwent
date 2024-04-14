@@ -28,19 +28,24 @@ Result Deck::fromVariant(const QVariantHash& deckData)
     if (deckData["name"].typeId() != QMetaType::QString)
         return ResultError{"\'name\' must be string"};
 
+    m_name = deckData["name"].toString();
+
     if (!deckData.contains("fraction"))
         return ResultError{"\'fraction\' not specified"};
 
     if (deckData["fraction"].typeId() != QMetaType::QString)
         return ResultError{"\'fraction\' must be string"};
 
+    m_fraction = deckData["fraction"].toString();
+
     if (!deckData.contains("cards"))
         return ResultError{"\'cards\' not specified"};
 
-    if (deckData["cards"].typeId() != QMetaType::QStringList)
+    const auto cards = deckData["cards"];
+    if (cards.typeId() != QMetaType::QVariantList && cards.typeId() != QMetaType::QStringList)
         return ResultError{"\'cards\' must be array of strings"};
 
-    for (const auto& cardName : deckData["cards"].toStringList())
+    for (const auto& cardName : cards.toStringList())
     {
         if (!m_cards.add(cardName))
             return ResultError{QString{"failed to add card\'%1\'"}.arg(cardName)};

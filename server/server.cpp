@@ -9,8 +9,8 @@
 #include <common/events/lobby_updated_event.h>
 #include <common/events/start_game_event.h>
 #include <common/events/request_game_event.h>
-#include <common/doorstep_state.h>
-#include <common/lobby_state.h>
+#include <common/states/doorstep_state.h>
+#include <common/states/lobby_state.h>
 #include <common/events/add_deck_event.h>
 #include <common/events/update_deck_event.h>
 #include <common/events/erase_deck_event.h>
@@ -42,23 +42,23 @@ void Server::onNewConnection()
 
     connect(player->socket(), &Socket::disconnected, player, [player, this]() { onDisconnected(player); });
 
-    connect(player->doorstepState(), &DoorstepState::logging, this,
+    connect(player, &Player::logging, this,
             [this, player](LogInEvent* event) { onLoggingIn(player, event); });
-    connect(player->doorstepState(), &DoorstepState::registration, this,
+    connect(player, &Player::registration, this,
             [this, player](RegisterEvent* event) { onRegistration(player, event); });
-    connect(player->lobbyState(), &LobbyState::loggedIn, this,
+    connect(player, &Player::loggedIn, this,
             [this, player](LoggedInEvent* event) { onLoggedIn(player, event); });
-    connect(player->lobbyState(), &LobbyState::updatingLobby, this,
+    connect(player, &Player::updatingLobby, this,
             [this, player](UpdateLobbyEvent* event) { onLobbyUpdating(player, event); });
-    connect(player->lobbyState(), &LobbyState::startingGame, this,
+    connect(player, &Player::startingGame, this,
             [this, player](StartGameEvent* event) { onStartGame(player, event); });
-    connect(player->lobbyState(), &LobbyState::gameAccepted, this,
+    connect(player, &Player::gameAccepted, this,
             [this, player](GameAcceptedEvent* event) { onGameAccepted(player, event); });
-    connect(player->lobbyState(), &LobbyState::addingDeck, this,
+    connect(player, &Player::addingDeck, this,
             [this, player](AddDeckEvent* event) { onAddDeck(player, event); });
-    connect(player->lobbyState(), &LobbyState::updatingDeck, this,
+    connect(player, &Player::updatingDeck, this,
             [this, player](UpdateDeckEvent* event) { onUpdateDeck(player, event); });
-    connect(player->lobbyState(), &LobbyState::erasingDeck, this,
+    connect(player, &Player::erasingDeck, this,
             [this, player](EraseDeckEvent* event) { onEraseDeck(player, event); });
 
     qDebug() << __func__ << player->socket()->requestUrl();

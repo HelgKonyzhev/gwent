@@ -102,9 +102,6 @@ public:
 
     QByteArray toRawJson() const;
 
-    void setSource(QObject* source) { m_source = source; }
-    QObject* source() const { return m_source; }
-
 private:
     static constexpr size_t typeNum(Type tid)
     {
@@ -112,8 +109,6 @@ private:
     }
 
     static std::vector<EventCreator>& eventCreators();
-
-    QObject* m_source;
 };
 
 Q_DECLARE_METATYPE(Event);

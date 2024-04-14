@@ -1,11 +1,11 @@
 #include "quick_player.h"
 #include <common/events/login_event.h>
 #include <common/events/register_event.h>
-#include <QStateMachine>
-#include <common/lobby_state.h>
+#include <common/states/lobby_state.h>
 #include <common/deck.h>
 #include <common/events/add_deck_event.h>
 #include <common/events/update_deck_event.h>
+#include <common/state_machine.h>
 
 class QuickPlayer::EditingDeck : public QObject
 {

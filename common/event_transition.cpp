@@ -28,7 +28,7 @@ void EventTransition::onTransition(QEvent *event)
                  << event->type();
         emit triggered(e);
 
-        if (e->source() != m_socket)
+        if (!e->isAccepted())
             m_socket->sendEvent(*e);
     }
 }

@@ -76,7 +76,7 @@ ResultValue PlayerStore::get(const QString& username, const QString& password)
 Result PlayerStore::save()
 {
     QFile usersFile{UsersFile};
-    if (!usersFile.open(QIODeviceBase::Text | QIODeviceBase::ReadWrite))
+    if (!usersFile.open(QIODeviceBase::Text | QIODeviceBase::ReadWrite | QIODeviceBase::Truncate))
         return ResultError{"save failed"};
 
     QJsonArray playersJs;

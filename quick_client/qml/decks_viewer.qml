@@ -69,15 +69,26 @@ Item {
         }
     }
 
-    function reload() {//        console.log(player.data.name)
-        //        var deckNames = player.data.deckNames
-        //        for (var i = 0; i < deckNames.length; ++i)
-        //            decksListModel.append({
-        //                                      "name": deckNames[i]
-        //                                  })
+    function reload() {
+        decksListModel.clear()
+
+        var deckNames = player.data.deckNames
+        for (var i = 0; i < deckNames.length; ++i) {
+            decksListModel.append({
+                                      "name": deckNames[i]
+                                  })
+        }
     }
 
     Component.onCompleted: {
         reload()
+    }
+
+    Connections {
+        target: player
+
+        function onDeckEdited(event) {
+            reload()
+        }
     }
 }

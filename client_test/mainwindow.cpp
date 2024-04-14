@@ -15,8 +15,8 @@
 #include <common/events/start_game_event.h>
 #include <QMessageBox>
 #include <common/events/request_game_event.h>
-#include <common/doorstep_state.h>
-#include <common/lobby_state.h>
+#include <common/states/doorstep_state.h>
+#include <common/states/lobby_state.h>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -146,17 +146,16 @@ MainWindow::MainWindow(QWidget* parent)
     }
 
     connect(m_socket, &Socket::eventRecieved, this, &MainWindow::onEventRecieved);
-    
-    connect(m_player->doorstepState(), &DoorstepState::registered, this, &MainWindow::onRegistered);
-    connect(m_player->doorstepState(), &DoorstepState::registrationFailed, this,
-            &MainWindow::onRegistrationFailed);
-    connect(m_player->doorstepState(), &DoorstepState::loginFailed, this, &MainWindow::onLogInFailed);
 
-    connect(m_player->lobbyState(), &LobbyState::loggedIn, this, &MainWindow::onLoggedIn);
-    connect(m_player->lobbyState(), &LobbyState::lobbyUpdated, this, &MainWindow::onLobbyUpdated);
-    connect(m_player->lobbyState(), &LobbyState::gameStartFailed, this, &MainWindow::onGameStartFailed);
-    connect(m_player->lobbyState(), &LobbyState::gameRequested, this, &MainWindow::onGameRequested);
-    connect(m_player->lobbyState(), &LobbyState::gameStarted, this, &MainWindow::onGameStarted);
+    connect(m_player, &Player::registered, this, &MainWindow::onRegistered);
+    connect(m_player, &Player::registrationFailed, this, &MainWindow::onRegistrationFailed);
+    connect(m_player, &Player::loginFailed, this, &MainWindow::onLogInFailed);
+
+    connect(m_player, &Player::loggedIn, this, &MainWindow::onLoggedIn);
+    connect(m_player, &Player::lobbyUpdated, this, &MainWindow::onLobbyUpdated);
+    connect(m_player, &Player::gameStartFailed, this, &MainWindow::onGameStartFailed);
+    connect(m_player, &Player::gameRequested, this, &MainWindow::onGameRequested);
+    connect(m_player, &Player::gameStarted, this, &MainWindow::onGameStarted);
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -256,7 +255,8 @@ void MainWindow::onGameRequested(RequestGameEvent* event)
     }
     else
     {
-        m_player->postEvent(new GameStartFailedEvent{QString{"declined by %1"}.arg(m_player->data()->name())});
+        m_player->postEvent(
+            new GameStartFailedEvent{QString{"declined by %1"}.arg(m_player->data()->name())});
     }
 }
 
